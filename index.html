@@ -63,11 +63,11 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .check-item:hover{border-color:#BDC3C7;background:#F8F9FA}
 .check-item.state-ok{background:#F0FAF5;border-color:#58D68D}
 .check-item.state-warn{background:#FEF0F0;border-color:#E74C3C}
-.check-item.state-amber{background:#FEFAF0;border-color:#E67E22}
+.check-item.state-amber{background:#F1EFE8;border-color:#888780}
 .cb-box{width:18px;height:18px;min-width:18px;border-radius:4px;border:1.5px solid #BDC3C7;background:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .12s}
 .state-ok .cb-box{background:#2ECC71;border-color:#2ECC71}
 .state-warn .cb-box{background:#E74C3C;border-color:#E74C3C}
-.state-amber .cb-box{background:#E67E22;border-color:#E67E22}
+.state-amber .cb-box{background:#888780;border-color:#888780}
 .cb-box svg{display:none}
 .state-ok .cb-box svg,.state-warn .cb-box svg,.state-amber .cb-box svg{display:block}
 .item-content{flex:1;min-width:0}
@@ -76,7 +76,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .item-action{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
 .action-ok{background:#EAFAF1;color:#1E8449}
 .action-warn{background:#FDEDEC;color:#C0392B}
-.action-amber{background:#FEF9E7;color:#784212}
+.action-amber{background:#F1EFE8;color:#444441}
 
 /* ── Summary ── */
 .summary-card{background:#fff;border-radius:12px;border:2px solid #1C2833;overflow:hidden;margin-bottom:14px}
@@ -84,7 +84,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .summary-head-title{color:#fff;font-size:13px;font-weight:700}
 .summary-stats{display:flex;gap:8px;flex-wrap:wrap}
 .stat-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.chip-warn{background:#E74C3C;color:#fff}.chip-amber{background:#E67E22;color:#fff}
+.chip-warn{background:#E74C3C;color:#fff}.chip-amber{background:#888780;color:#fff}
 .chip-ok{background:#2ECC71;color:#fff}.chip-neutral{background:#566573;color:#fff}
 .summary-body{padding:16px 18px}
 .summary-section{margin-bottom:14px}
@@ -95,20 +95,20 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .summary-sec-title{font-size:12px;font-weight:700;color:#1C2833}
 .summary-row{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:7px;margin-bottom:5px;font-size:12px}
 .summary-row:last-child{margin-bottom:0}
-.summary-row.s-warn{background:#FEF0F0}.summary-row.s-amber{background:#FEFAF0}.summary-row.s-ok{background:#F0FAF5}
+.summary-row.s-warn{background:#FEF0F0}.summary-row.s-amber{background:#F1EFE8}.summary-row.s-ok{background:#F0FAF5}
 .s-dot{width:7px;height:7px;border-radius:50%;min-width:7px;margin-top:4px}
-.d-warn{background:#E74C3C}.d-amber{background:#E67E22}.d-ok{background:#2ECC71}
+.d-warn{background:#E74C3C}.d-amber{background:#888780}.d-ok{background:#2ECC71}
 .s-text{flex:1;min-width:0}
 .s-main{font-weight:700;color:#1C2833}.s-tip{color:#5D6D7E;font-size:11px;margin-top:1px}
 .verdict-final{border-radius:9px;padding:13px 15px;margin-top:12px;font-size:12px;line-height:1.7}
 .vf-warn{background:#FDEDEC;border:1.5px solid #E74C3C;color:#C0392B}
-.vf-amber{background:#FEF9E7;border:1.5px solid #E67E22;color:#784212}
+.vf-amber{background:#F1EFE8;border:1.5px solid #888780;color:#444441}
 .vf-ok{background:#EAFAF1;border:1.5px solid #2ECC71;color:#1E8449}
 .vf-title{font-weight:700;font-size:13px;margin-bottom:4px}
 .progress-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .prog-chip{background:#fff;border:1px solid #E8EAED;border-radius:8px;padding:8px 6px;text-align:center}
 .prog-num{font-size:18px;font-weight:700;color:#1C2833}
-.prog-num.red{color:#E74C3C}.prog-num.amber{color:#E67E22}.prog-num.green{color:#2ECC71}
+.prog-num.red{color:#E74C3C}.prog-num.amber{color:#888780}.prog-num.green{color:#2ECC71}
 .prog-label{font-size:10px;color:#95A5A6;margin-top:1px}
 .reset-row{text-align:right;margin-top:10px}
 .reset-btn{background:none;border:none;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:#95A5A6;cursor:pointer;text-decoration:underline;padding:0}
@@ -116,7 +116,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .legend{display:flex;gap:16px;flex-wrap:wrap;padding:10px 18px;background:#F8F9FA;border-top:1px solid #F0F2F5;font-size:11px;color:#5D6D7E}
 .legend-item{display:flex;align-items:center;gap:5px}
 .l-dot{width:7px;height:7px;border-radius:50%}
-.d-ok2{background:#2ECC71}.d-warn2{background:#E74C3C}.d-amb2{background:#E67E22}
+.d-ok2{background:#2ECC71}.d-warn2{background:#E74C3C}.d-amb2{background:#888780}
 .hint{font-size:11px;color:#7F8C8D;background:#F0F3F4;border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.6}
 .empty-state{text-align:center;padding:32px 20px;color:#BDC3C7;font-size:13px}
 
@@ -142,7 +142,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .vs-btn{flex:1;padding:8px 6px;font-size:11px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border:1.5px solid #E8EAED;border-radius:8px;background:#fff;cursor:pointer;text-align:center;transition:all .12s}
 .vs-btn.sel-ok{background:#EAFAF1;border-color:#2ECC71;color:#1E8449}
 .vs-btn.sel-warn{background:#FDEDEC;border-color:#E74C3C;color:#C0392B}
-.vs-btn.sel-amber{background:#FEF9E7;border-color:#E67E22;color:#784212}
+.vs-btn.sel-amber{background:#F1EFE8;border-color:#888780;color:#444441}
 .vs-btn:not(.sel-ok):not(.sel-warn):not(.sel-amber):hover{background:#F8F9FA}
 
 /* Add button */
@@ -156,7 +156,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .admin-item-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;padding-right:2px}
 .admin-item{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:8px;border:1px solid #E8EAED;background:#fff;font-size:12px}
 .admin-item.v-warn{border-left:3px solid #E74C3C}
-.admin-item.v-amber{border-left:3px solid #E67E22}
+.admin-item.v-amber{border-left:3px solid #888780}
 .admin-item.v-ok{border-left:3px solid #2ECC71}
 .admin-item-body{flex:1;min-width:0}
 .admin-item-title{font-weight:700;color:#1C2833;margin-bottom:2px}
@@ -194,9 +194,40 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .item-manage-count{font-size:11px;color:#95A5A6}
 .btn-del-item{background:none;border:1px solid #FADBD8;color:#C0392B;font-size:11px;font-family:'Noto Sans TC',sans-serif;padding:4px 10px;border-radius:6px;cursor:pointer}
 .btn-del-item:hover{background:#FDEDEC}
+
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:#fff;border-radius:12px;padding:24px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.18)}
+.modal-title{font-size:14px;font-weight:700;color:#1C2833;margin-bottom:6px}
+.modal-sub{font-size:12px;color:#7F8C8D;margin-bottom:16px}
+.modal-input{width:100%;padding:10px 12px;font-size:13px;font-family:'Noto Sans TC',sans-serif;border:1.5px solid #D5D8DC;border-radius:8px;margin-bottom:8px}
+.modal-input:focus{outline:none;border-color:#1C2833}
+.modal-input.err{border-color:#E74C3C}
+.modal-err{font-size:11px;color:#E74C3C;margin-bottom:12px;display:none}
+.modal-err.show{display:block}
+.modal-btns{display:flex;gap:8px}
+.modal-btn-ok{flex:1;padding:10px;font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:#1C2833;color:#fff;border:none;border-radius:8px;cursor:pointer}
+.modal-btn-ok:hover{background:#2C3E50}
+.modal-btn-cancel{padding:10px 16px;font-size:13px;font-family:'Noto Sans TC',sans-serif;background:none;border:1.5px solid #D5D8DC;border-radius:8px;cursor:pointer;color:#7F8C8D}
+.modal-btn-cancel:hover{background:#F8F9FA}
 </style>
 </head>
 <body>
+
+
+<!-- Password Modal -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="modal-box">
+    <div class="modal-title">管理模式</div>
+    <div class="modal-sub">請輸入管理者密碼才能進入編輯</div>
+    <input class="modal-input" type="password" id="pw-input" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="modal-err" id="pw-err">密碼錯誤，請再試一次</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closePwModal()">取消</button>
+      <button class="modal-btn-ok" onclick="checkPw()">確認</button>
+    </div>
+  </div>
+</div>
 
 <div class="header">
   <div class="header-left">
@@ -206,7 +237,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
     </div>
     <div class="badge">LIVE</div>
   </div>
-  <button class="admin-toggle" id="admin-toggle-btn" onclick="toggleAdmin()">⚙ 管理模式</button>
+  <button class="admin-toggle" id="admin-toggle-btn" onclick="promptAdmin()">⚙ 管理模式</button>
 </div>
 
 <div class="admin-banner" id="admin-banner">
@@ -652,6 +683,33 @@ function resetChecked(){ checked={}; renderBoth(); }
 /* ══════════════════════════════════════════════════
    ADMIN MODE
 ══════════════════════════════════════════════════ */
+
+const ADMIN_PW = 'formii422';
+
+function promptAdmin(){
+  if(isAdmin){ toggleAdmin(); return; }
+  document.getElementById('pw-modal').className='modal-overlay show';
+  setTimeout(()=>document.getElementById('pw-input').focus(),100);
+}
+function closePwModal(){
+  document.getElementById('pw-modal').className='modal-overlay';
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-err').className='modal-err';
+  document.getElementById('pw-input').className='modal-input';
+}
+function checkPw(){
+  const val=document.getElementById('pw-input').value;
+  if(val===ADMIN_PW){
+    closePwModal();
+    toggleAdmin();
+  } else {
+    document.getElementById('pw-err').className='modal-err show';
+    document.getElementById('pw-input').className='modal-input err';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+
 let isAdmin=false;
 
 function toggleAdmin(){
