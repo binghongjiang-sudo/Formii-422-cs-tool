@@ -529,7 +529,32 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
         <div class="admin-item-list" id="admin-func-list"></div>
       </div>
     </div>
-  </div>
+  
+      <!-- Tab: 情境判斷設定 -->
+      <div id="admin-tab-sc" class="card-body" style="display:none">
+        <div class="save-notice" id="save-notice-sc">已儲存</div>
+        <div style="padding:4px 0 14px">
+          <div class="form-label" style="margin-bottom:6px">選擇商品</div>
+          <select id="sc-admin-prod" onchange="renderScAdminPanel()" style="font-family:'Noto Sans TC',sans-serif;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;padding:8px 12px;width:200px">
+            <option value="fan">循環扇</option>
+            <option value="handfan">手持風扇</option>
+            <option value="oven">蒸氣烤箱</option>
+            <option value="hairdryer">吹風機</option>
+            <option value="ricecooker">電鍋</option>
+            <option value="juicer">果汁機</option>
+            <option value="kettle">電熱水壺</option>
+            <option value="coffee">咖啡機</option>
+            <option value="oven2">電烤箱</option>
+            <option value="standfan">立扇</option>
+            <option value="steamer">掛燙機</option>
+            <option value="heater">電暖器</option>
+            <option value="airpurifier">空氣清淨機</option>
+            <option value="dehumidifier">除濕機</option>
+          </select>
+        </div>
+        <div id="sc-admin-panel"></div>
+      </div>
+</div>
 
 </div>
 
@@ -929,6 +954,7 @@ function switchAdminTab(t){
   if(t==='app') renderAdminAppList();
   if(t==='func') renderAdminFuncList();
   if(t==='item') renderItemManageList();
+  if(t==='sc'){renderScAdminPanel();}
 }
 
 function selVerdict(type,v,btn){
@@ -1071,46 +1097,119 @@ function renderAdminLists(){
 
 
 /* ══ SCENARIO FLOW ══ */
-const PROD_MAP={'循環扇':'fan','手持風扇':'handfan','蒸氣烤箱':'oven'};
+const PROD_MAP={'循環扇':'fan','手持風扇':'handfan','蒸氣烤箱':'oven','吹風機':'hairdryer','電鍋':'ricecooker','果汁機':'juicer','電熱水壺':'kettle','咖啡機':'coffee','電烤箱':'oven2','立扇':'standfan','掛燙機':'steamer','電暖器':'heater','空氣清淨機':'airpurifier','除濕機':'dehumidifier'};
 const SC_DATA={
   fan:{
     name:'循環扇',costItem:1200,costRepair:1400,ratio:117,type:'danger',
-    alertMsg:'維修費 > 商品成本 — 建議直接換新',
-    alertSub:'馬達/葉片更換成本高，換新品比維修更划算',
-    step2:[['什麼時候發現的？','拆封當下即發現','使用後才發現'],['損傷在哪個位置？','背面縫隙 / 底部','正面使用面 / 突出角'],['有沒有摔過或碰撞？','明確否認且說法一致','猶豫 / 改口'],['保護膜有沒有撕？','膜完整，膜下已有損','膜已撕除'],['有沒有開機使用過？','完全未開機','使用後才出問題']],
-    step3:[['葉片缺損/裂開','non','出廠品管不良','human','外力撞擊'],['馬達異音','non','DOA首次啟動異常','—',''],['底座裂痕（縫隙內側）','non','射出成型縮水','—',''],['外殼使用面深刮','—','','human','硬物摩擦'],['電源線破損','gray','確認破損位置','human','夾壓拉扯']],
-    scripts:{
-      non:{label:'換新話術（廠商責任）',cls:'teal',txt:'「您好，根據您提供的照片，我們確認這個狀況屬於商品本身的問題。由於循環扇的維修費用較高，我們直接為您安排換新品，請問您的收件地址是否與原訂單相同？」'},
-      gray:{label:'退回鑑定話術（灰色地帶）',cls:'amber',txt:'「感謝您的說明，為了給您最正確的處理方式，需要請您將商品寄回讓我們確認一下狀況。若鑑定結果為商品本身問題，我們全額負責換新；若為使用造成，會再與您說明後續費用。」'},
-      human:{label:'客戶責任話術',cls:'red',txt:'「感謝您的說明。從照片來看，這個損傷的位置和方式比較像是外力造成的。循環扇的維修費用約 NT$1,400，已超過商品成本，建議您考慮直接購買新品，會比送修划算。」'}
-    },
-    actions:{non:['info|⟳ 直接換新品','|📦 退回鑑定'],gray:['|📦 退回鑑定','danger|✕ 視鑑定結果決定'],human:['danger|✕ 建議購買新品','|🔧 客戶自費維修']}
+    alertMsg:'維修費 > 商品成本 — 建議直接換新',alertSub:'馬達/葉片更換成本高，換新品比維修更划算',
+    step2:[['什麼時候發現的?','拆封當下即發現','使用後才發現'],['損傷在哪個位置?','背面縫隙/底部','正面使用面/突出角'],['有沒有摔過或碰撞?','明確否認且說法一致','猶豫/改口'],['保護膜有沒有撕?','膜完整膜下已有損','膜已撕除'],['有沒有開機使用過?','完全未開機','使用後才出問題']],
+    step3:[['葉片缺損/裂開','non','出廠品管不良','human','外力撞擊'],['馬達異音','non','DOA首次啟動異常','human','異物進入'],['底座裂痕縫隙內側','non','射出成型縮水','--',''],['外殼使用面深刮','--','','human','硬物摩擦'],['電源線破損','gray','確認破損位置','human','夾壓拉扯']],
+    scripts:{non:{label:'換新話術(廠商責任)',cls:'teal',txt:'您好，根據您提供的照片，我們確認這個狀況屬於商品本身的問題。由於循環扇的維修費用較高，我們直接為您安排換新品，請問您的收件地址是否與原訂單相同？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，為了給您最正確的處理方式，需要請您將商品寄回讓我們確認。若屬商品問題全額換新，若為使用造成會再與您說明後續費用。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您的說明。從照片來看，這個損傷比較像是外力造成的。循環扇的維修費用約NT$1,400已超過商品成本，建議您考慮直接購買新品會比送修划算。'}},
+    actions:{non:['info|換新品','|退回鑑定'],gray:['|退回鑑定','danger|視鑑定結果決定'],human:['danger|建議購新品','|客戶自費維修']}
   },
   handfan:{
     name:'手持風扇',costItem:480,costRepair:650,ratio:135,type:'danger',
-    alertMsg:'維修費 > 商品成本 — 強烈建議直接換新',
-    alertSub:'手持風扇單價低，任何維修都不划算，直接換新為最佳解',
-    step2:[['什麼時候發現的？','拆封當下即發現','使用後才發現'],['損傷在哪個位置？','背面 / 充電孔周圍','正面 / 螢幕 / 突出角'],['有沒有摔過或碰撞？','明確否認且說法一致','猶豫 / 改口'],['保護膜有沒有撕？','膜完整，膜下已有損','膜已撕除'],['有沒有開機使用過？','完全未開機','使用後才出問題']],
-    step3:[['電池無法充電','non','電芯品質不良','—',''],['開機無反應','non','DOA','—',''],['機身正面深刮','—','','human','跌落碰撞'],['充電孔變形','—','','human','強行插拔'],['按鍵卡住','gray','確認是否液體滲入','human','液體損壞']],
-    scripts:{
-      non:{label:'換新話術（廠商責任）',cls:'teal',txt:'「您好，手持風扇這個狀況我們確認是商品本身的問題。因為維修費用會比商品本身還高，所以我們直接安排換新品給您，不需要您退回舊品。請確認一下收件地址。」'},
-      gray:{label:'退回鑑定話術（灰色地帶）',cls:'amber',txt:'「感謝您的說明，需要請您將商品寄回讓我們確認一下狀況，若屬商品問題全額換新，若為使用造成會再與您說明。」'},
-      human:{label:'客戶責任話術',cls:'red',txt:'「感謝您的說明。從照片來看，這個損傷比較像是外力造成的。手持風扇的維修費用比商品售價還高，建議您直接購買新品，會比送修更划算。」'}
-    },
-    actions:{non:['info|⟳ 直接換新品（無需退回）'],gray:['|📦 退回鑑定'],human:['danger|✕ 建議購買新品']}
+    alertMsg:'維修費 > 商品成本 — 強烈建議直接換新',alertSub:'手持風扇單價低，任何維修都不划算，直接換新為最佳解',
+    step2:[['什麼時候發現的?','拆封當下即發現','使用後才發現'],['損傷在哪個位置?','背面/充電孔周圍','正面/螢幕/突出角'],['有沒有摔過或碰撞?','明確否認且說法一致','猶豫/改口'],['保護膜有沒有撕?','膜完整膜下已有損','膜已撕除'],['有沒有開機使用過?','完全未開機','使用後才出問題']],
+    step3:[['電池無法充電','non','電芯品質不良','--',''],['開機無反應','non','DOA','--',''],['機身正面深刮','--','','human','跌落碰撞'],['充電孔變形','--','','human','強行插拔'],['按鍵卡住','gray','確認是否液體滲入','human','液體損壞']],
+    scripts:{non:{label:'換新話術(廠商責任)',cls:'teal',txt:'您好，手持風扇這個狀況我們確認是商品本身的問題。因為維修費用會比商品本身還高，所以我們直接安排換新品給您，不需要您退回舊品。請確認一下收件地址。'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額換新，若為使用造成會再與您說明。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您的說明。從照片來看，這個損傷比較像是外力造成的。手持風扇的維修費用比商品售價還高，建議您直接購買新品會比送修更划算。'}},
+    actions:{non:['info|直接換新品(無需退回)'],gray:['|退回鑑定'],human:['danger|建議購買新品']}
   },
   oven:{
     name:'蒸氣烤箱',costItem:4500,costRepair:1800,ratio:40,type:'success',
-    alertMsg:'維修費 < 商品成本 — 可安排維修',
-    alertSub:'蒸氣烤箱單價高，維修費用佔成本 40%，維修方案合理',
-    step2:[['什麼時候發現的？','拆封/首次使用即異常','使用一段時間後'],['損傷在哪個位置？','內部元件 / 加熱管','玻璃門 / 外殼正面'],['有沒有摔過或碰撞？','明確否認且說法一致','猶豫 / 改口'],['有沒有異物放入？','沒有','不確定 / 有放入異物'],['有沒有開機使用過？','完全未使用','已使用後才出問題']],
-    step3:[['加熱不均/無法升溫','non','加熱管出廠異常','—',''],['控制面板無反應','non','電路板DOA','—',''],['外殼凹陷/玻璃門裂','—','','human','搬運撞擊'],['內部燒焦異味','—','','human','使用不當'],['門鉸鏈鬆動','gray','確認使用頻率','human','過度用力開關']],
-    scripts:{
-      non:{label:'免費維修話術（廠商責任）',cls:'teal',txt:'「您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們會安排維修服務，維修期間約 5–7 個工作天，費用由我們全額負擔，請問您方便的時間是？」'},
-      gray:{label:'退回鑑定話術（灰色地帶）',cls:'amber',txt:'「感謝您的說明，需要請您將商品寄回讓我們確認。若屬商品問題，維修費用全額由我們負擔；若為使用造成，維修費用約 NT$1,800，會再與您確認。」'},
-      human:{label:'客戶責任話術',cls:'red',txt:'「感謝您提供照片。從損傷位置來看，這個情況比較像是外力造成的。蒸氣烤箱的維修費用約 NT$1,800，比重新購買划算很多，請問您是否要安排付費維修服務？」'}
-    },
-    actions:{non:['ok|🔧 安排免費維修','|📦 退回鑑定'],gray:['|📦 退回鑑定'],human:['danger|💰 客戶付費維修 NT$1,800','|📦 退回鑑定']}
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'蒸氣烤箱單價高，維修費用佔成本40%，維修方案合理',
+    step2:[['什麼時候發現的?','拆封/首次使用即異常','使用一段時間後'],['損傷在哪個位置?','內部元件/加熱管','玻璃門/外殼正面'],['有沒有摔過或碰撞?','明確否認且說法一致','猶豫/改口'],['有沒有異物放入?','沒有','不確定/有放入異物'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['加熱不均/無法升溫','non','加熱管出廠異常','--',''],['控制面板無反應','non','電路板DOA','--',''],['外殼凹陷/玻璃門裂','--','','human','搬運撞擊'],['內部燒焦異味','--','','human','使用不當'],['門鉸鏈鬆動','gray','確認使用頻率','human','過度用力開關']],
+    scripts:{non:{label:'免費維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們會安排維修服務，維修期間約5-7個工作天，費用由我們全額負擔，請問您方便的時間是？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認。若屬商品問題維修費用全額負擔，若為使用造成維修費用約NT$1,800會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是外力造成的。蒸氣烤箱的維修費用約NT$1,800比重新購買划算很多，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排免費維修','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$1800','|退回鑑定']}
+  },
+  hairdryer:{
+    name:'吹風機',costItem:800,costRepair:600,ratio:75,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'吹風機維修費用佔成本75%，視損傷程度決定維修或換新',
+    step2:[['什麼時候發現的?','拆封當下即發現','使用後才發現'],['損傷在哪個位置?','網罩內側/馬達區','出風口正面/把手'],['有沒有碰撞或摔落?','明確否認且說法一致','猶豫/改口'],['保護膜有沒有撕?','膜完整膜下已有損','膜已撕除'],['有沒有開機使用過?','完全未開機','使用後才出問題']],
+    step3:[['出風口網罩破損','non','出廠品管不良','human','外力碰撞'],['馬達無法啟動','non','DOA首次無反應','--',''],['出風口熔化變形','--','','human','長時間過熱使用'],['進風口濾網破損','gray','確認是否耗材','human','強行拆除'],['機身明顯燒焦','--','','human','使用不當/過熱']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您提供的照片，我們確認這個狀況屬於商品本身的問題。我們將為您安排換新品或維修，請問您的收件地址是否與原訂單相同？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認一下狀況，若屬商品問題全額處理，若為使用造成會再與您說明。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您的說明。從照片來看，這個損傷比較像是外力或使用方式造成的。維修費用約NT$600，請問您是否要安排付費維修？'}},
+    actions:{non:['info|安排換新/維修','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$600']}
+  },
+  ricecooker:{
+    name:'電鍋',costItem:1500,costRepair:800,ratio:53,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'電鍋維修費用佔成本53%，維修方案合理',
+    step2:[['什麼時候發現的?','拆封/首次使用即異常','使用一段時間後'],['損傷在哪個位置?','感溫器/加熱盤','鍋蓋/內鍋塗層'],['有沒有摔過或碰撞?','明確否認且說法一致','猶豫/改口'],['內鍋有沒有刮傷痕跡?','全新無刮痕','有刮傷痕跡'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法啟動','non','電路板DOA','--',''],['加熱盤異常','non','出廠品管問題','--',''],['內鍋塗層刮傷','--','','human','金屬器具刮傷'],['鍋蓋玻璃破裂','gray','確認是否碰撞','human','外力撞擊'],['跳鍵無法正常運作','non','感溫器異常','gray','確認水量是否正確']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排維修或換新，維修期間約5-7個工作天，費用由我們全額負擔。'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$800會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，內鍋塗層的損傷比較像是使用不當造成的。建議使用木質或矽膠器具避免刮傷，維修費用約NT$800。'}},
+    actions:{non:['ok|安排維修/換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$800']}
+  },
+  juicer:{
+    name:'果汁機',costItem:1200,costRepair:700,ratio:58,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'果汁機維修費用佔成本58%，維修方案合理',
+    step2:[['什麼時候發現的?','拆封/首次使用即異常','使用一段時間後'],['損傷在哪個位置?','馬達底座/刀片組','杯體/密封圈'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['刀片有沒有缺損?','完整無缺損','有缺損或彎曲'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['馬達無法啟動','non','DOA','--',''],['杯體裂縫','gray','確認是否碰撞','human','外力撞擊'],['刀片缺損彎曲','--','','human','硬物損壞或使用不當'],['密封圈老化破損','gray','確認使用時長','human','使用不當'],['漏水','gray','確認刀片組安裝','human','密封圈損壞']],
+    scripts:{non:{label:'換新話術(廠商責任)',cls:'teal',txt:'您好，根據您提供的照片，這個狀況屬於商品本身的問題。我們將為您安排換新品，請問您的收件地址是否與原訂單相同？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額換新，若為使用造成維修費用約NT$700會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷來看，這個情況比較像是使用不當造成的。建議更換刀片組，費用約NT$700，請問您是否要安排？'}},
+    actions:{non:['info|安排換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$700']}
+  },
+  kettle:{
+    name:'電熱水壺',costItem:900,costRepair:500,ratio:56,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'電熱水壺維修費用佔成本56%，維修方案合理',
+    step2:[['什麼時候發現的?','拆封/首次使用即異常','使用一段時間後'],['損傷在哪個位置?','加熱底板/電路','壺蓋/把手/壺身'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['壺內壁有沒有刮傷?','全新無刮傷','有明顯刮傷'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法加熱','non','加熱元件DOA','--',''],['沸騰後不跳停','non','感應器異常','gray','確認蒸氣孔是否堵塞'],['壺身裂縫漏水','gray','確認是否碰撞','human','外力撞擊'],['把手斷裂','--','','human','外力/過重使用'],['壺內壁刮傷','--','','human','金屬器具刮傷']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排換新或維修，費用由我們全額負擔，請問您的收件地址是否與原訂單相同？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$500會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是外力或使用方式造成的。維修費用約NT$500，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排換新/維修','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$500']}
+  },
+  coffee:{
+    name:'咖啡機',costItem:2800,costRepair:1200,ratio:43,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'咖啡機維修費用佔成本43%，維修方案合理',
+    step2:[['什麼時候發現的?','首次使用即異常','使用一段時間後'],['損傷在哪個位置?','出水嘴/加熱管','蒸氣棒/玻璃壺'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['有沒有執行除垢?','新機未使用','長期未除垢'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法啟動','non','電路板DOA','--',''],['出水量極少','non','首次即異常','gray','水垢堵塞(使用後)'],['玻璃壺破裂','gray','確認是否碰撞','human','外力撞擊'],['蒸氣棒彎曲','--','','human','外力造成'],['出水嘴漏水','gray','確認安裝方式','human','零件損壞']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排維修或換新，費用由我們全額負擔，請問您方便的時間是？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$1,200會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是外力造成的。維修費用約NT$1,200，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排維修/換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$1200']}
+  },
+  oven2:{
+    name:'電烤箱',costItem:2000,costRepair:900,ratio:45,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'電烤箱維修費用佔成本45%，維修方案合理',
+    step2:[['什麼時候發現的?','首次使用即異常','使用一段時間後'],['損傷在哪個位置?','加熱管/溫控','玻璃門/烤盤'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['有沒有放入異物?','沒有','不確定/有放入異物'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法加熱','non','加熱管DOA','--',''],['溫控異常','non','溫控器問題','gray','確認設定方式'],['玻璃門破裂','gray','確認是否碰撞','human','外力撞擊/熱脹冷縮不當'],['烤盤塗層刮傷','--','','human','金屬器具使用'],['旋鈕斷裂','--','','human','外力造成']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排維修或換新，費用由我們全額負擔，請問您方便的時間是？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$900會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是外力或使用不當造成的。維修費用約NT$900，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排維修/換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$900']}
+  },
+  standfan:{
+    name:'立扇',costItem:1000,costRepair:600,ratio:60,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'立扇維修費用佔成本60%，視損傷程度決定',
+    step2:[['什麼時候發現的?','拆封當下即發現','使用後才發現'],['損傷在哪個位置?','馬達/底座縫隙','扇葉/網罩/桿身'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['扇葉有沒有缺損?','完整無缺損','有缺損或彎曲'],['有沒有開機使用過?','完全未開機','使用後才出問題']],
+    step3:[['馬達無法啟動','non','DOA','--',''],['扇葉斷裂缺損','gray','確認是否外力','human','碰撞/跌落'],['桿身裂縫','--','','human','外力造成'],['底座裂痕(縫隙)','non','射出成型問題','human','外力踢踩'],['異常噪音振動','gray','確認扇葉積塵','human','扇葉變形']],
+    scripts:{non:{label:'換新話術(廠商責任)',cls:'teal',txt:'您好，根據您提供的照片，我們確認這個狀況屬於商品本身的問題。我們將為您安排換新品，請問您的收件地址是否與原訂單相同？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額換新，若為使用造成維修費用約NT$600會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您的說明。從照片來看，這個損傷比較像是外力造成的。立扇的維修費用約NT$600，請問您是否要安排付費維修？'}},
+    actions:{non:['info|安排換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$600']}
+  },
+  steamer:{
+    name:'掛燙機',costItem:1800,costRepair:800,ratio:44,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'掛燙機維修費用佔成本44%，維修方案合理',
+    step2:[['什麼時候發現的?','首次使用即異常','使用一段時間後'],['損傷在哪個位置?','蒸氣泵/加熱板','蒸氣管/熨燙頭'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['蒸氣孔有沒有水垢?','新機未使用','已有水垢堵塞'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無蒸氣','non','蒸氣泵DOA','gray','水垢堵塞(使用後)'],['漏水滴水','gray','確認水箱安裝','human','水箱破損'],['熨燙頭燒焦','--','','human','溫度設定不當'],['蒸氣管破損','--','','human','外力折壓'],['加熱無反應','non','電路板DOA','--','']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排維修或換新，費用由我們全額負擔，請問您方便的時間是？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$800會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是使用不當造成的。維修費用約NT$800，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排維修/換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$800']}
+  },
+  heater:{
+    name:'電暖器',costItem:2200,costRepair:900,ratio:41,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'電暖器維修費用佔成本41%，維修方案合理',
+    step2:[['什麼時候發現的?','首次使用即異常','使用一段時間後'],['損傷在哪個位置?','加熱元件/溫控','外殼/旋鈕/網罩'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['有沒有異味或異常?','首次使用即有燒焦味','正常運作後才出現'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法啟動','non','電路板DOA','--',''],['加熱效果極差','non','加熱元件異常','gray','確認環境溫度'],['外殼燒焦燻黑','--','','human','使用不當/覆蓋物品'],['旋鈕斷裂','--','','human','外力造成'],['傾倒保護失效','non','安全裝置DOA','--','']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題，且涉及安全疑慮。我們將立即安排換新，請勿繼續使用，請問您的收件地址是否與原訂單相同？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，由於電暖器涉及安全問題，需要請您先停止使用並將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$900會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是使用不當造成的。為安全起見建議停止使用，維修費用約NT$900，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|立即安排換新','|退回鑑定'],gray:['|退回鑑定(安全優先)'],human:['danger|客戶付費維修NT$900']}
+  },
+  airpurifier:{
+    name:'空氣清淨機',costItem:3500,costRepair:1200,ratio:34,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'空氣清淨機維修費用佔成本34%，維修方案合理',
+    step2:[['什麼時候發現的?','首次使用即異常','使用一段時間後'],['損傷在哪個位置?','風扇/感測器/電路','濾網/外殼面板'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['濾網有沒有正確安裝?','確認已正確安裝','不確定安裝方式'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法啟動','non','電路板DOA','--',''],['觸控面板無反應','non','首次使用即異常','--',''],['風量明顯不足','gray','確認濾網安裝','human','濾網堵塞嚴重'],['外殼裂縫','--','','human','外力撞擊'],['感測器失效','non','出廠即異常','gray','積塵影響']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排維修或換新，費用由我們全額負擔，請問您方便的時間是？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$1,200會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是外力或使用不當造成的。維修費用約NT$1,200，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排維修/換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$1200']}
+  },
+  dehumidifier:{
+    name:'除濕機',costItem:4000,costRepair:1500,ratio:38,type:'success',
+    alertMsg:'維修費 < 商品成本 — 可安排維修',alertSub:'除濕機維修費用佔成本38%，維修方案合理',
+    step2:[['什麼時候發現的?','首次使用即異常','使用一段時間後'],['損傷在哪個位置?','壓縮機/電路板','集水桶/外殼/滾輪'],['有沒有碰撞或摔落?','明確否認','有碰撞/摔落過'],['集水桶有沒有正確安裝?','確認已正確安裝','不確定安裝方式'],['有沒有開機使用過?','完全未使用','已使用後才出問題']],
+    step3:[['完全無法啟動','non','電路板DOA','--',''],['完全無除濕效果','non','壓縮機DOA','gray','確認環境溫度'],['集水桶破裂','--','','human','外力撞擊'],['外殼凹陷裂縫','--','','human','外力造成'],['控制面板無反應','non','面板DOA','--','']],
+    scripts:{non:{label:'換新/維修話術(廠商責任)',cls:'teal',txt:'您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們將安排維修或換新，費用由我們全額負擔，請問您方便的時間是？'},gray:{label:'退回鑑定話術(灰色)',cls:'amber',txt:'感謝您的說明，需要請您將商品寄回讓我們確認，若屬商品問題全額處理，若為使用造成維修費用約NT$1,500會再與您確認。'},human:{label:'客戶責任話術',cls:'red',txt:'感謝您提供照片。從損傷位置來看，這個情況比較像是外力造成的。維修費用約NT$1,500，請問您是否要安排付費維修？'}},
+    actions:{non:['ok|安排維修/換新','|退回鑑定'],gray:['|退回鑑定'],human:['danger|客戶付費維修NT$1500']}
   }
 };
 const SC_SCORES={fan:0,handfan:0,oven:0};
@@ -1216,7 +1315,7 @@ function editAppItem(idx) {
   openEditModal('編輯外觀項目 — ' + r.item,
     '<div class="em-row"><div class="em-label">部位名稱</div><input class="em-input" id="em-app-p" value="' + r.p.replace(/"/g,'&quot;') + '"></div>' +
     '<div class="em-row"><div class="em-label">損傷項目</div><input class="em-input" id="em-app-d" value="' + r.d.replace(/"/g,'&quot;') + '"></div>' +
-    '<div class="em-row"><div class="em-label">判定類別</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict('warn',this)">人為損傷</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict('amber',this)">灰色地帶</button><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict('ok',this)">正常耗損</button></div></div>' +
+    '<div class="em-row"><div class="em-label">判定類別</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict(\'warn\',this)">人為損傷</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict(\'amber\',this)">灰色地帶</button><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict(\'ok\',this)">正常耗損</button></div></div>' +
     '<div class="em-row"><div class="em-label">處理建議</div><textarea class="em-textarea" id="em-app-tip">' + r.tip + '</textarea></div>',
     { type: 'app', idx: idx }
   );
@@ -1228,7 +1327,7 @@ function editFuncItem(idx) {
   openEditModal('編輯功能性項目 — ' + r.item,
     '<div class="em-row"><div class="em-label">問題現象</div><input class="em-input" id="em-func-p" value="' + r.p.replace(/"/g,'&quot;') + '"></div>' +
     '<div class="em-row"><div class="em-label">客服確認步驟</div><textarea class="em-textarea" id="em-func-d">' + r.d + '</textarea></div>' +
-    '<div class="em-row"><div class="em-label">可排除狀態</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict('ok',this)">可線上排除</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict('amber',this)">需進一步確認</button><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict('warn',this)">需回倉（安全）</button></div></div>' +
+    '<div class="em-row"><div class="em-label">可排除狀態</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict(\'ok\',this)">可線上排除</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict(\'amber\',this)">需進一步確認</button><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict(\'warn\',this)">需回倉（安全）</button></div></div>' +
     '<div class="em-row"><div class="em-label">排除方法/處理建議</div><textarea class="em-textarea" id="em-func-tip">' + r.tip + '</textarea></div>',
     { type: 'func', idx: idx }
   );
@@ -1251,7 +1350,7 @@ function renderScAdminPanel() {
     '<div style="margin-top:8px"><div class="em-label">維修類型</div><select class="em-input" id="sc-cost-type" style="width:auto"><option value="danger"' + (d.type==='danger'?' selected':'') + '>維修費 > 成本（紅色警示）</option><option value="success"' + (d.type==='success'?' selected':'') + '>維修費 < 成本（綠色安心）</option></select></div>' +
     '<div style="margin-top:8px"><div class="em-label">警示標題</div><input class="em-input" id="sc-alert-msg" value="' + d.alertMsg + '"></div>' +
     '<div style="margin-top:8px"><div class="em-label">警示說明</div><input class="em-input" id="sc-alert-sub" value="' + d.alertSub + '"></div>' +
-    '<button class="sc-save-btn" onclick="saveScCost('' + key + '')">儲存成本設定</button></div>';
+    '<button class="sc-save-btn" onclick="saveScCost(\'' + key + '\')">儲存成本設定</button></div>';
 
   // step2 section
   let s2rows = d.step2.map((r,i) =>
@@ -1261,7 +1360,7 @@ function renderScAdminPanel() {
   ).join('');
   let step2HTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">❓ Step 2 — 口述問題清單</div>' +
     '<table class="sc-tbl-edit"><tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>' + s2rows + '</table>' +
-    '<button class="sc-save-btn" onclick="saveScStep2('' + key + '')">儲存 Step 2</button></div>';
+    '<button class="sc-save-btn" onclick="saveScStep2(\'' + key + '\')">儲存 Step 2</button></div>';
 
   // step3 section
   let s3rows = d.step3.map((r,i) =>
@@ -1271,7 +1370,7 @@ function renderScAdminPanel() {
   ).join('');
   let step3HTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">📷 Step 3 — 照片特徵判斷</div>' +
     '<table class="sc-tbl-edit"><tr><th>損傷現象</th><th>非人為說明</th><th>人為說明</th></tr>' + s3rows + '</table>' +
-    '<button class="sc-save-btn" onclick="saveScStep3('' + key + '')">儲存 Step 3</button></div>';
+    '<button class="sc-save-btn" onclick="saveScStep3(\'' + key + '\')">儲存 Step 3</button></div>';
 
   // scripts section
   let scriptHTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">💬 Step 5 — 回覆話術</div>';
@@ -1281,7 +1380,7 @@ function renderScAdminPanel() {
     scriptHTML += '<div style="margin-bottom:10px"><div class="em-label">' + labels[sk] + ' — 標題</div><input class="em-input" id="sc-sc-' + sk + '-lbl" value="' + sc.label.replace(/"/g,'&quot;') + '" style="margin-bottom:6px">' +
       '<div class="em-label">話術內容</div><textarea class="em-textarea" id="sc-sc-' + sk + '-txt" rows="3">' + sc.txt + '</textarea></div>';
   });
-  scriptHTML += '<button class="sc-save-btn" onclick="saveScScripts('' + key + '')">儲存話術</button></div>';
+  scriptHTML += '<button class="sc-save-btn" onclick="saveScScripts(\'' + key + '\')">儲存話術</button></div>';
 
   el.innerHTML = costHTML + step2HTML + step3HTML + scriptHTML;
 }
