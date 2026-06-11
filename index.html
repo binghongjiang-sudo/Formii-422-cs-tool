@@ -210,6 +210,90 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .modal-btn-ok:hover{background:#2C3E50}
 .modal-btn-cancel{padding:10px 16px;font-size:13px;font-family:'Noto Sans TC',sans-serif;background:none;border:1.5px solid #D5D8DC;border-radius:8px;cursor:pointer;color:#7F8C8D}
 .modal-btn-cancel:hover{background:#F8F9FA}
+
+/* ══════════════════════════════
+   SCENARIO TAB STYLES
+══════════════════════════════ */
+.main-tabs{display:flex;gap:0;border-bottom:2px solid #E8EAED;margin-bottom:18px;overflow-x:auto}
+.main-tab{padding:10px 18px;font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:none;border:none;border-bottom:3px solid transparent;color:#95A5A6;cursor:pointer;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
+.main-tab.on{color:#1C2833;border-bottom-color:#1C2833}
+.main-tab.on.sc{color:#C0392B;border-bottom-color:#C0392B}
+.main-section{display:none}
+.main-section.show{display:block}
+
+/* product tabs */
+.prod-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.prod-tab{padding:7px 16px;font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border-radius:20px;border:1.5px solid #E8EAED;background:#fff;color:#7F8C8D;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
+.prod-tab:hover{background:#F8F9FA}
+.prod-tab.on{background:#1C2833;border-color:#1C2833;color:#fff}
+
+/* cost grid */
+.cost-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.cost-cell{background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;padding:10px 12px}
+.cost-cell .cc-l{font-size:10px;color:#7F8C8D;margin-bottom:3px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.cost-cell .cc-v{font-size:17px;font-weight:700;color:#1C2833}
+.cost-cell.c-warn{background:#FEF0F0;border-color:#F1948A}
+.cost-cell.c-warn .cc-l{color:#C0392B}
+.cost-cell.c-warn .cc-v{color:#C0392B}
+.cost-cell.c-ok{background:#EAFAF1;border-color:#A9DFBF}
+.cost-cell.c-ok .cc-l{color:#1E8449}
+.cost-cell.c-ok .cc-v{color:#1E8449}
+
+/* alert banner */
+.sc-alert{border-radius:9px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;border:1.5px solid}
+.sc-alert.danger{background:#FEF0F0;border-color:#E74C3C}
+.sc-alert.success{background:#EAFAF1;border-color:#2ECC71}
+.sc-alert-icon{font-size:17px;flex-shrink:0;margin-top:1px}
+.sc-alert.danger .sc-alert-icon,.sc-alert.danger .sc-alert-t{color:#C0392B}
+.sc-alert.success .sc-alert-icon,.sc-alert.success .sc-alert-t{color:#1E8449}
+.sc-alert-t{font-size:13px;font-weight:700}
+.sc-alert-d{font-size:12px;color:#5D6D7E;margin-top:2px;line-height:1.5}
+
+/* damage table */
+.dmg-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px}
+.dmg-tbl th{background:#F0F3F4;font-weight:700;padding:7px 10px;text-align:left;border-bottom:1px solid #E8EAED;color:#5D6D7E;font-size:11px;letter-spacing:.03em}
+.dmg-tbl td{padding:7px 10px;border-bottom:1px solid #F0F2F5;vertical-align:top;line-height:1.5;color:#1C2833}
+.dmg-tbl tr:last-child td{border-bottom:none}
+.dtag{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:2px 7px}
+.dtag.non{background:#E1F5EE;color:#085041}
+.dtag.human{background:#FCEBEB;color:#791F1F}
+.dtag.gray{background:#FEF9E7;color:#784212}
+
+/* script box */
+.script-bx{background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;padding:11px 14px;margin-bottom:8px}
+.script-lbl{font-size:10px;font-weight:700;color:#7F8C8D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.script-txt{font-size:12px;color:#1C2833;line-height:1.75;border-left:3px solid #D5D8DC;padding-left:10px}
+.script-bx.teal .script-lbl{color:#117A65}
+.script-bx.teal .script-txt{border-left-color:#2ECC71}
+.script-bx.red .script-lbl{color:#C0392B}
+.script-bx.red .script-txt{border-left-color:#E74C3C}
+.script-bx.amber .script-lbl{color:#784212}
+.script-bx.amber .script-txt{border-left-color:#F39C12}
+
+/* score bar */
+.sc-score-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;margin-bottom:12px;flex-wrap:wrap}
+.sc-score-lbl{font-size:12px;color:#7F8C8D;white-space:nowrap}
+.sc-score-num{font-size:20px;font-weight:700;color:#1C2833;min-width:26px;text-align:center}
+.sc-score-verd{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+.sv-pend{background:#F0F3F4;color:#7F8C8D}
+.sv-non{background:#E1F5EE;color:#085041}
+.sv-gray{background:#FEF9E7;color:#784212}
+.sv-human{background:#FCEBEB;color:#791F1F}
+.sc-score-btns{display:flex;gap:6px;margin-left:auto}
+.sc-s-btn{font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid #D5D8DC;background:#fff;color:#1C2833;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.sc-s-btn:hover{background:#F0F3F4}
+
+/* action row */
+.sc-act-row{display:flex;gap:8px;flex-wrap:wrap}
+.sc-act-btn{font-size:12px;padding:7px 14px;border-radius:20px;border:1.5px solid #D5D8DC;background:#fff;color:#1C2833;cursor:pointer;font-family:'Noto Sans TC',sans-serif;display:flex;align-items:center;gap:5px;font-weight:700;transition:all .12s}
+.sc-act-btn:hover{background:#F8F9FA}
+.sc-act-btn.info{background:#EBF5FB;border-color:#AED6F1;color:#1A5276}
+.sc-act-btn.danger{background:#FDEDEC;border-color:#F1948A;color:#C0392B}
+
+.sc-divider{height:1px;background:#F0F2F5;margin:14px 0}
+.sc-sec-lbl{font-size:10px;font-weight:700;color:#95A5A6;letter-spacing:.07em;text-transform:uppercase;margin:0 0 8px;display:block}
+.sc-hint{font-size:11px;color:#7F8C8D;background:#F0F3F4;border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.6}
+
 </style>
 </head>
 <body>
@@ -246,7 +330,14 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 
 <div class="container">
 
+  <!-- ══ Main Tab Bar ══ -->
+  <div class="main-tabs">
+    <button class="main-tab on" id="mtab-cs" onclick="switchMainTab('cs')">📋 客服排除選單</button>
+    <button class="main-tab sc" id="mtab-sc" onclick="switchMainTab('sc')">🔍 情境一判斷腳本</button>
+  </div>
+
   <!-- ══ 客服模式 ══ -->
+  <div id="main-cs" class="main-section show">
   <div id="cs-section">
     <div class="card">
       <div class="card-head"><div class="card-head-left"><div class="step-num">1</div><div class="card-head-title">選擇品項</div></div></div>
@@ -282,6 +373,221 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
       <div id="summary-area"></div>
     </div>
   </div>
+
+  </div><!-- /main-cs -->
+
+  <!-- ══ 情境一判斷腳本 ══ -->
+  <div id="main-sc" class="main-section">
+  <div class="card">
+    <div class="card-head"><div class="card-head-left"><div class="step-num" style="background:#C0392B">!</div><div class="card-head-title">情境一 — 外箱完好 / 商品受損</div></div></div>
+    <div class="card-body">
+      <div class="sc-hint">客服流程：蒐集資訊 → 請客戶提供照片 → 計分判斷 → 依商品成本比對決定換新或維修</div>
+
+      <!-- Product tabs -->
+      <span class="sc-sec-lbl">選擇商品</span>
+      <div class="prod-tabs">
+        <button class="prod-tab on" id="ptab-fan" onclick="switchProd('fan')">循環扇</button>
+        <button class="prod-tab" id="ptab-handfan" onclick="switchProd('handfan')">手持風扇</button>
+        <button class="prod-tab" id="ptab-oven" onclick="switchProd('oven')">蒸氣烤箱</button>
+      </div>
+
+      <!-- ── 循環扇 ── -->
+      <div id="ppanel-fan">
+        <span class="sc-sec-lbl">成本比對</span>
+        <div class="cost-grid-3">
+          <div class="cost-cell"><div class="cc-l">商品成本</div><div class="cc-v">NT$ 1,200</div></div>
+          <div class="cost-cell c-warn"><div class="cc-l">預估維修費</div><div class="cc-v">NT$ 1,400</div></div>
+          <div class="cost-cell c-warn"><div class="cc-l">成本比</div><div class="cc-v">117%</div></div>
+        </div>
+        <div class="sc-alert danger">
+          <span class="sc-alert-icon">⚠</span>
+          <div><div class="sc-alert-t">維修費 &gt; 商品成本 — 建議直接換新</div>
+          <div class="sc-alert-d">馬達/葉片更換成本高，換新品比維修更划算</div></div>
+        </div>
+
+        <span class="sc-sec-lbl">Step 2 — 客戶口述現象（電話引導問句）</span>
+        <table class="dmg-tbl">
+          <tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>
+          <tr><td>什麼時候發現的？</td><td>拆封當下即發現</td><td>使用後才發現</td></tr>
+          <tr><td>損傷在哪個位置？</td><td>背面縫隙 / 底部</td><td>正面使用面 / 突出角</td></tr>
+          <tr><td>有沒有摔過或碰撞？</td><td>明確否認且說法一致</td><td>猶豫 / 改口</td></tr>
+          <tr><td>保護膜有沒有撕？</td><td>膜完整，膜下已有損</td><td>膜已撕除</td></tr>
+          <tr><td>有沒有開機使用過？</td><td>完全未開機</td><td>使用後才出問題</td></tr>
+        </table>
+
+        <span class="sc-sec-lbl">Step 3 — 照片判斷特徵</span>
+        <table class="dmg-tbl">
+          <tr><th>照片項目</th><th>非人為</th><th>人為</th></tr>
+          <tr><td>葉片缺損 / 裂開</td><td><span class="dtag non">非人為</span> 出廠品管不良</td><td><span class="dtag human">人為</span> 外力撞擊</td></tr>
+          <tr><td>馬達異音</td><td><span class="dtag non">非人為</span> DOA 首次啟動異常</td><td><span class="dtag human">人為</span> 異物進入</td></tr>
+          <tr><td>底座裂痕（縫隙內側）</td><td><span class="dtag non">非人為</span> 射出成型縮水</td><td><span class="dtag human">人為</span> 跌落撞擊</td></tr>
+          <tr><td>外殼使用面深刮</td><td>—</td><td><span class="dtag human">人為</span> 硬物摩擦</td></tr>
+          <tr><td>電源線破損</td><td><span class="dtag gray">灰色</span> 確認破損位置</td><td><span class="dtag human">人為</span> 夾壓拉扯</td></tr>
+        </table>
+
+        <span class="sc-sec-lbl">Step 4 — 即時計分</span>
+        <div class="sc-score-bar">
+          <span class="sc-score-lbl">目前分數</span>
+          <span class="sc-score-num" id="sc-num-fan">0</span>
+          <span class="sc-score-verd sv-pend" id="sc-verd-fan">待判斷</span>
+          <div class="sc-score-btns">
+            <button class="sc-s-btn" onclick="scAdd('fan',1)">＋1 非人為</button>
+            <button class="sc-s-btn" onclick="scAdd('fan',-1)">－1 人為</button>
+            <button class="sc-s-btn" onclick="scReset('fan')" style="color:#95A5A6">重置</button>
+          </div>
+        </div>
+
+        <span class="sc-sec-lbl">Step 5 — 客服回覆話術</span>
+        <div class="script-bx teal">
+          <div class="script-lbl">換新話術（廠商責任 / 分數 ≥ 3）</div>
+          <div class="script-txt">「您好，根據您提供的照片，我們確認這個狀況屬於商品本身的問題。由於循環扇的維修費用較高，我們直接為您安排換新品，請問您的收件地址是否與原訂單相同？」</div>
+        </div>
+        <div class="script-bx amber">
+          <div class="script-lbl">退回鑑定話術（灰色地帶 / 分數 1–2）</div>
+          <div class="script-txt">「感謝您的說明，為了給您最正確的處理方式，需要請您將商品寄回讓我們確認一下狀況。若鑑定結果為商品本身問題，我們全額負責換新；若為使用造成，會再與您說明後續費用。」</div>
+        </div>
+        <div class="script-bx red">
+          <div class="script-lbl">客戶責任話術（分數 ≤ 0）</div>
+          <div class="script-txt">「感謝您的說明。從照片來看，這個損傷的位置和方式比較像是外力造成的。循環扇的維修費用約 NT$1,400，因已超過商品成本，建議您考慮直接購買新品，會比送修划算。」</div>
+        </div>
+        <div class="sc-act-row" style="margin-top:12px">
+          <button class="sc-act-btn info">⟳ 直接換新品</button>
+          <button class="sc-act-btn">📦 退回鑑定</button>
+          <button class="sc-act-btn danger">✕ 客戶自費 / 建議購新</button>
+        </div>
+      </div>
+
+      <!-- ── 手持風扇 ── -->
+      <div id="ppanel-handfan" style="display:none">
+        <span class="sc-sec-lbl">成本比對</span>
+        <div class="cost-grid-3">
+          <div class="cost-cell"><div class="cc-l">商品成本</div><div class="cc-v">NT$ 480</div></div>
+          <div class="cost-cell c-warn"><div class="cc-l">預估維修費</div><div class="cc-v">NT$ 650</div></div>
+          <div class="cost-cell c-warn"><div class="cc-l">成本比</div><div class="cc-v">135%</div></div>
+        </div>
+        <div class="sc-alert danger">
+          <span class="sc-alert-icon">⚠</span>
+          <div><div class="sc-alert-t">維修費 &gt; 商品成本 — 強烈建議直接換新</div>
+          <div class="sc-alert-d">手持風扇單價低，任何維修都不划算，直接換新為最佳解</div></div>
+        </div>
+
+        <span class="sc-sec-lbl">Step 2 — 客戶口述現象</span>
+        <table class="dmg-tbl">
+          <tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>
+          <tr><td>什麼時候發現的？</td><td>拆封當下即發現</td><td>使用後才發現</td></tr>
+          <tr><td>損傷在哪個位置？</td><td>背面 / 充電孔周圍</td><td>正面 / 螢幕 / 突出角</td></tr>
+          <tr><td>有沒有摔過或碰撞？</td><td>明確否認且說法一致</td><td>猶豫 / 改口</td></tr>
+          <tr><td>保護膜有沒有撕？</td><td>膜完整，膜下已有損</td><td>膜已撕除</td></tr>
+          <tr><td>有沒有開機使用過？</td><td>完全未開機</td><td>使用後才出問題</td></tr>
+        </table>
+
+        <span class="sc-sec-lbl">Step 3 — 照片判斷特徵</span>
+        <table class="dmg-tbl">
+          <tr><th>損傷現象</th><th>非人為</th><th>人為</th></tr>
+          <tr><td>電池無法充電</td><td><span class="dtag non">非人為</span> 電芯品質不良</td><td>—</td></tr>
+          <tr><td>開機無反應</td><td><span class="dtag non">非人為</span> DOA</td><td>—</td></tr>
+          <tr><td>機身正面深刮</td><td>—</td><td><span class="dtag human">人為</span> 跌落碰撞</td></tr>
+          <tr><td>充電孔變形</td><td>—</td><td><span class="dtag human">人為</span> 強行插拔</td></tr>
+          <tr><td>按鍵卡住</td><td><span class="dtag gray">灰色</span> 確認是否液體滲入</td><td><span class="dtag human">人為</span> 液體損壞</td></tr>
+        </table>
+
+        <span class="sc-sec-lbl">Step 4 — 即時計分</span>
+        <div class="sc-score-bar">
+          <span class="sc-score-lbl">目前分數</span>
+          <span class="sc-score-num" id="sc-num-handfan">0</span>
+          <span class="sc-score-verd sv-pend" id="sc-verd-handfan">待判斷</span>
+          <div class="sc-score-btns">
+            <button class="sc-s-btn" onclick="scAdd('handfan',1)">＋1 非人為</button>
+            <button class="sc-s-btn" onclick="scAdd('handfan',-1)">－1 人為</button>
+            <button class="sc-s-btn" onclick="scReset('handfan')" style="color:#95A5A6">重置</button>
+          </div>
+        </div>
+
+        <span class="sc-sec-lbl">Step 5 — 客服回覆話術</span>
+        <div class="script-bx teal">
+          <div class="script-lbl">換新話術（廠商責任 / 分數 ≥ 3）</div>
+          <div class="script-txt">「您好，手持風扇這個狀況我們確認是商品本身的問題。因為維修費用會比商品本身還高，所以我們直接安排換新品給您，不需要您退回舊品。請確認一下收件地址。」</div>
+        </div>
+        <div class="script-bx red">
+          <div class="script-lbl">客戶責任話術（分數 ≤ 0）</div>
+          <div class="script-txt">「感謝您的說明。從照片來看，這個損傷的位置和方式比較像是外力造成的。手持風扇的維修費用其實比商品售價還高，建議您可以考慮直接購買新品，會比送修更划算。」</div>
+        </div>
+        <div class="sc-act-row" style="margin-top:12px">
+          <button class="sc-act-btn info">⟳ 直接換新品</button>
+          <button class="sc-act-btn">📦 退回鑑定</button>
+          <button class="sc-act-btn danger">✕ 建議客戶購買新品</button>
+        </div>
+      </div>
+
+      <!-- ── 蒸氣烤箱 ── -->
+      <div id="ppanel-oven" style="display:none">
+        <span class="sc-sec-lbl">成本比對</span>
+        <div class="cost-grid-3">
+          <div class="cost-cell"><div class="cc-l">商品成本</div><div class="cc-v">NT$ 4,500</div></div>
+          <div class="cost-cell c-ok"><div class="cc-l">預估維修費</div><div class="cc-v">NT$ 1,800</div></div>
+          <div class="cost-cell c-ok"><div class="cc-l">成本比</div><div class="cc-v">40%</div></div>
+        </div>
+        <div class="sc-alert success">
+          <span class="sc-alert-icon">✓</span>
+          <div><div class="sc-alert-t">維修費 &lt; 商品成本 — 可安排維修</div>
+          <div class="sc-alert-d">蒸氣烤箱單價高，維修費用佔成本 40%，維修方案合理</div></div>
+        </div>
+
+        <span class="sc-sec-lbl">Step 2 — 客戶口述現象</span>
+        <table class="dmg-tbl">
+          <tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>
+          <tr><td>什麼時候發現的？</td><td>拆封 / 首次使用即異常</td><td>使用一段時間後</td></tr>
+          <tr><td>損傷在哪個位置？</td><td>內部元件 / 加熱管</td><td>玻璃門 / 外殼正面</td></tr>
+          <tr><td>有沒有摔過或碰撞？</td><td>明確否認且說法一致</td><td>猶豫 / 改口</td></tr>
+          <tr><td>有沒有異物放入？</td><td>沒有</td><td>不確定 / 有放入異物</td></tr>
+          <tr><td>有沒有開機使用過？</td><td>完全未使用</td><td>已使用後才出問題</td></tr>
+        </table>
+
+        <span class="sc-sec-lbl">Step 3 — 照片判斷特徵</span>
+        <table class="dmg-tbl">
+          <tr><th>損傷現象</th><th>非人為</th><th>人為</th></tr>
+          <tr><td>加熱不均 / 無法升溫</td><td><span class="dtag non">非人為</span> 加熱管出廠異常</td><td>—</td></tr>
+          <tr><td>控制面板無反應</td><td><span class="dtag non">非人為</span> 電路板 DOA</td><td>—</td></tr>
+          <tr><td>外殼凹陷 / 玻璃門裂</td><td>—</td><td><span class="dtag human">人為</span> 搬運撞擊</td></tr>
+          <tr><td>內部燒焦異味</td><td>—</td><td><span class="dtag human">人為</span> 使用不當</td></tr>
+          <tr><td>門鉸鏈鬆動</td><td><span class="dtag gray">灰色</span> 確認使用頻率</td><td><span class="dtag human">人為</span> 過度用力開關</td></tr>
+        </table>
+
+        <span class="sc-sec-lbl">Step 4 — 即時計分</span>
+        <div class="sc-score-bar">
+          <span class="sc-score-lbl">目前分數</span>
+          <span class="sc-score-num" id="sc-num-oven">0</span>
+          <span class="sc-score-verd sv-pend" id="sc-verd-oven">待判斷</span>
+          <div class="sc-score-btns">
+            <button class="sc-s-btn" onclick="scAdd('oven',1)">＋1 非人為</button>
+            <button class="sc-s-btn" onclick="scAdd('oven',-1)">－1 人為</button>
+            <button class="sc-s-btn" onclick="scReset('oven')" style="color:#95A5A6">重置</button>
+          </div>
+        </div>
+
+        <span class="sc-sec-lbl">Step 5 — 客服回覆話術</span>
+        <div class="script-bx teal">
+          <div class="script-lbl">免費維修話術（廠商責任 / 分數 ≥ 3）</div>
+          <div class="script-txt">「您好，根據您描述的狀況，這個問題屬於商品本身的品質問題。我們會安排技術人員維修，或提供寄修服務，維修期間約 5–7 個工作天，維修費用由我們全額負擔，請問您方便的時間是？」</div>
+        </div>
+        <div class="script-bx amber">
+          <div class="script-lbl">退回鑑定話術（灰色地帶 / 分數 1–2）</div>
+          <div class="script-txt">「感謝您的說明，為了給您最正確的處理方式，需要請您將商品寄回讓我們確認一下。若屬商品本身問題，維修費用全額由我們負擔；若為使用造成，維修費用約 NT$1,800，會再與您確認。」</div>
+        </div>
+        <div class="script-bx red">
+          <div class="script-lbl">客戶責任話術（分數 ≤ 0）</div>
+          <div class="script-txt">「感謝您提供照片。從損傷位置來看，這個情況比較像是外力造成的。蒸氣烤箱的維修費用約 NT$1,800，會比重新購買划算很多，請問您是否要安排付費維修服務？」</div>
+        </div>
+        <div class="sc-act-row" style="margin-top:12px">
+          <button class="sc-act-btn info">🔧 安排免費維修</button>
+          <button class="sc-act-btn">📦 退回鑑定</button>
+          <button class="sc-act-btn danger">💰 客戶付費維修 NT$1,800</button>
+        </div>
+      </div>
+
+    </div><!-- /card-body -->
+  </div><!-- /card -->
+  </div><!-- /main-sc -->
 
   <!-- ══ 管理模式 ══ -->
   <div id="admin-section" class="admin-section">
@@ -867,6 +1173,54 @@ function renderAdminLists(){
   renderItemManageList();
   renderAdminAppList();
   renderAdminFuncList();
+}
+
+
+
+/* ══════════════════════════════
+   MAIN TAB SWITCH
+══════════════════════════════ */
+function switchMainTab(t){
+  ['cs','sc'].forEach(x=>{
+    document.getElementById('main-'+x).classList.remove('show');
+    document.getElementById('mtab-'+x).classList.remove('on');
+  });
+  document.getElementById('main-'+t).classList.add('show');
+  document.getElementById('mtab-'+t).classList.add('on');
+  if(t==='sc') document.getElementById('mtab-'+t).classList.add('sc');
+}
+
+/* ══════════════════════════════
+   PRODUCT TAB SWITCH
+══════════════════════════════ */
+const PRODS=['fan','handfan','oven'];
+function switchProd(id){
+  PRODS.forEach(p=>{
+    document.getElementById('ppanel-'+p).style.display=p===id?'block':'none';
+    const btn=document.getElementById('ptab-'+p);
+    if(btn) btn.classList.toggle('on', p===id);
+  });
+}
+
+/* ══════════════════════════════
+   SCENARIO SCORING
+══════════════════════════════ */
+const SC_SCORES={fan:0,handfan:0,oven:0};
+function scAdd(id,v){
+  SC_SCORES[id]+=v;
+  document.getElementById('sc-num-'+id).textContent=SC_SCORES[id];
+  const el=document.getElementById('sc-verd-'+id);
+  const s=SC_SCORES[id];
+  if(s>=3){el.textContent='廠商責任';el.className='sc-score-verd sv-non';}
+  else if(s>=1){el.textContent='灰色 → 鑑定';el.className='sc-score-verd sv-gray';}
+  else if(s===0){el.textContent='待判斷';el.className='sc-score-verd sv-pend';}
+  else{el.textContent='客戶責任';el.className='sc-score-verd sv-human';}
+}
+function scReset(id){
+  SC_SCORES[id]=0;
+  document.getElementById('sc-num-'+id).textContent='0';
+  document.getElementById('sc-verd-'+id).textContent='待判斷';
+  document.getElementById('sc-verd-'+id).className='sc-score-verd sv-pend';
 }
 
 /* ── Init ── */
