@@ -1269,11 +1269,6 @@ function renderScFlow(){
     else if(SEL[k]==='gray') gC++;
   });
   var total=nC+hC+gC;
-  var ks=JSON.stringify(key);
-
-  function mkSel(type,idx,verdict){
-    return 'onclick="scSel('+ks+','+JSON.stringify(type)+','+idx+','+JSON.stringify(verdict)+')"';
-  }
 
   var html='<div class="sc-flow show">';
   html+='<div class="sc-flow-head"><div class="step-num" style="background:#C0392B">!</div>';
@@ -1291,34 +1286,34 @@ function renderScFlow(){
 
   html+='<span class="sc-sec">Step 2 &mdash; &#x53E3;&#x8FF0;&#x73FE;&#x8C61;&#x5224;&#x65B7;</span>';
   html+='<div class="sc-hint2">&#x9EDE;&#x9078;&#x7B26;&#x5408;&#x7684;&#x9078;&#x9805;&#xFF08;&#x53EF;&#x8907;&#x9078;&#xFF0C;&#x518D;&#x9EDE;&#x4E00;&#x6B21;&#x53D6;&#x6D88;&#xFF09;</div>';
-  html+='<div class="sel-wrap">';
+  html+='<div class="sel-wrap" id="sw-s2-'+key+'">';
   html+='<div class="sel-tbl-head"><div>&#x554F;&#x984C;</div><div>&#x975E;&#x4EBA;&#x70BA;&#x7279;&#x5FB5;</div><div>&#x4EBA;&#x70BA;&#x7279;&#x5FB5;</div></div>';
   for(var i=0;i<d.step2.length;i++){
-    var r=d.step2[i];
+    var r2=d.step2[i];
     var k2=key+'-s2-'+i;
     var sv2=SEL[k2]||'';
     html+='<div class="sel-row">';
-    html+='<div class="sel-q">'+r[0]+'</div>';
-    html+='<div class="sel-opt'+(sv2==='non'?' p-non':'')+'" '+mkSel('s2',i,'non')+'>';
-    html+='<div class="cc'+(sv2==='non'?' cc-non':'')+'">'+(sv2==='non'?'&#10003;':'')+'</div>';
-    html+='<span class="tn">&#x975E;&#x4EBA;&#x70BA;</span>'+r[1]+'</div>';
-    html+='<div class="sel-opt'+(sv2==='human'?' p-human':'')+'" '+mkSel('s2',i,'human')+'>';
-    html+='<div class="cc'+(sv2==='human'?' cc-human':'')+'">'+(sv2==='human'?'&#10003;':'')+'</div>';
-    html+='<span class="th2">&#x4EBA;&#x70BA;</span>'+r[2]+'</div>';
+    html+='<div class="sel-q">'+r2[0]+'</div>';
+    html+='<div class="sel-opt'+(sv2==='non'?' p-non':'')+'" data-key="'+key+'" data-type="s2" data-idx="'+i+'" data-verdict="non">';
+    html+='<div class="chkc'+(sv2==='non'?' chkc-non':'')+'">'+(sv2==='non'?'&#10003;':'')+'</div>';
+    html+='<span class="tn">&#x975E;&#x4EBA;&#x70BA;</span>'+r2[1]+'</div>';
+    html+='<div class="sel-opt'+(sv2==='human'?' p-human':'')+'" data-key="'+key+'" data-type="s2" data-idx="'+i+'" data-verdict="human">';
+    html+='<div class="chkc'+(sv2==='human'?' chkc-human':'')+'">'+(sv2==='human'?'&#10003;':'')+'</div>';
+    html+='<span class="th2">&#x4EBA;&#x70BA;</span>'+r2[2]+'</div>';
     html+='</div>';
   }
   html+='</div>';
 
   html+='<span class="sc-sec">Step 3 &mdash; &#x7167;&#x7247;&#x7279;&#x5FB5;&#x5224;&#x65B7;</span>';
   html+='<div class="sc-hint2">&#x4F9D;&#x7167;&#x7247;&#x5C0D;&#x7167;&#x9EDE;&#x9078;&#x7B26;&#x5408;&#x7279;&#x5FB5;</div>';
-  html+='<div class="sel-wrap">';
+  html+='<div class="sel-wrap" id="sw-s3-'+key+'">';
   html+='<div class="sel-tbl-head"><div>&#x640D;&#x50B7;&#x73FE;&#x8C61;</div><div>&#x975E;&#x4EBA;&#x70BA;</div><div>&#x4EBA;&#x70BA;</div></div>';
   for(var j=0;j<d.step3.length;j++){
     var s3r=d.step3[j];
     var k3=key+'-s3-'+j;
     var sv3=SEL[k3]||'';
     var isL=s3r[1]==='non'||s3r[1]==='gray';
-    var lv=s3r[1]==='non'?'non':'gray';
+    var lv=isL?(s3r[1]==='non'?'non':'gray'):'';
     var lTag=s3r[1]==='non'?'tn':'tg';
     var lLbl=s3r[1]==='non'?'&#x975E;&#x4EBA;&#x70BA;':'&#x7070;&#x8272;';
     var lContent=isL&&s3r[2]?('<span class="'+lTag+'">'+lLbl+'</span>'+s3r[2]):'&mdash;';
@@ -1326,14 +1321,14 @@ function renderScFlow(){
     html+='<div class="sel-row">';
     html+='<div class="sel-q">'+s3r[0]+'</div>';
     if(isL){
-      html+='<div class="sel-opt'+(sv3===lv?' p-'+(lv==='non'?'non':'gray'):'')+'" '+mkSel('s3',j,lv)+'>';
-      html+='<div class="cc'+(sv3===lv?' cc-'+(lv==='non'?'non':'gray'):'')+'">'+(sv3===lv?'&#10003;':'')+'</div>'+lContent+'</div>';
+      html+='<div class="sel-opt'+(sv3===lv?' p-'+(lv==='non'?'non':'gray'):'')+'" data-key="'+key+'" data-type="s3" data-idx="'+j+'" data-verdict="'+lv+'">';
+      html+='<div class="chkc'+(sv3===lv?' chkc-'+(lv==='non'?'non':'gray'):'')+'">'+(sv3===lv?'&#10003;':'')+'</div>'+lContent+'</div>';
     } else {
       html+='<div class="sel-opt na">&mdash;</div>';
     }
     if(s3r[3]==='human'){
-      html+='<div class="sel-opt'+(sv3==='human'?' p-human':'')+'" '+mkSel('s3',j,'human')+'>';
-      html+='<div class="cc'+(sv3==='human'?' cc-human':'')+'">'+(sv3==='human'?'&#10003;':'')+'</div>'+rContent+'</div>';
+      html+='<div class="sel-opt'+(sv3==='human'?' p-human':'')+'" data-key="'+key+'" data-type="s3" data-idx="'+j+'" data-verdict="human">';
+      html+='<div class="chkc'+(sv3==='human'?' chkc-human':'')+'">'+(sv3==='human'?'&#10003;':'')+'</div>'+rContent+'</div>';
     } else {
       html+='<div class="sel-opt na">&mdash;</div>';
     }
@@ -1343,14 +1338,42 @@ function renderScFlow(){
 
   html+='<span class="sc-sec">Step 5 &mdash; &#x7E3D;&#x7D50;&#x5EFA;&#x8B70;</span>';
   if(total>0){
-    html+='<button class="clr-sel-btn" onclick="scClearKey('+ks+')">&#x6E05;&#x9664;&#x9078;&#x53D6;</button><div style="clear:both"></div>';
+    html+='<button class="clr-sel-btn" data-clearkey="'+key+'">&#x6E05;&#x9664;&#x9078;&#x53D6;</button><div style="clear:both"></div>';
     var verdict='gray',sc2='s-gray',st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x7070;&#x8272;&#x5730;&#x5E36; &mdash; &#x5EFA;&#x8B70;&#x9000;&#x56DE;&#x9451;&#x5B9A;';
     if(nC>=2&&hC===0){verdict='non';sc2='s-non';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x5EE0;&#x5546;&#x8CAC;&#x4EFB;';}
     else if(hC>=2&&nC===0){verdict='human';sc2='s-human';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x5BA2;&#x6236;&#x8CAC;&#x4EFB;';}
     else if(nC>hC&&hC===0){verdict='non';sc2='s-non';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x50BE;&#x5411;&#x5EE0;&#x5546;&#x8CAC;&#x4EFB;';}
     else if(hC>nC&&nC===0){verdict='human';sc2='s-human';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x50BE;&#x5411;&#x5BA2;&#x6236;&#x8CAC;&#x4EFB;';}
     var sc3=d.scripts[verdict];
-    var acts3=(d.actions[verdict]||[]).map(function(a){var p=a.split('|');return '<button class="sc-act '+p[0]+'">'+p[1]+'</button>';}).join('');
+    var acts=(d.actions[verdict]||[]).map(function(a){var p=a.split('|');return '<button class="sc-act '+p[0]+'">'+p[1]+'</button>';}).join('');
+
+    // Build detail list of all selected items
+    var details='<div style="margin-bottom:10px">';
+    details+='<div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:5px">&#x5DF2;&#x52FE;&#x9078;&#x9805;&#x76EE;&#xFF1A;</div>';
+    Object.keys(SEL).forEach(function(k){
+      if(k.indexOf(key+'-')!==0) return;
+      var parts=k.split('-');
+      var tp=parts[parts.length-2];
+      var idx2=parseInt(parts[parts.length-1]);
+      var vv=SEL[k];
+      var label='',content='';
+      if(parts[1]==='s2'&&d.step2[idx2]){
+        label=d.step2[idx2][0];
+        content=vv==='non'?d.step2[idx2][1]:d.step2[idx2][2];
+      } else if(parts[1]==='s3'&&d.step3[idx2]){
+        label=d.step3[idx2][0];
+        content=vv==='non'?d.step3[idx2][2]:vv==='gray'?d.step3[idx2][2]:d.step3[idx2][4];
+      }
+      var tagCls=vv==='non'?'tn':vv==='human'?'th2':'tg';
+      var tagLbl=vv==='non'?'&#x975E;&#x4EBA;&#x70BA;':vv==='human'?'&#x4EBA;&#x70BA;':'&#x7070;&#x8272;';
+      details+='<div style="font-size:12px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:6px">';
+      details+='<span class="'+tagCls+'">'+tagLbl+'</span>';
+      details+='<span style="color:var(--color-text-secondary)">'+label+'</span>';
+      details+='<span style="color:var(--color-text-primary)">&rarr; '+content+'</span>';
+      details+='</div>';
+    });
+    details+='</div>';
+
     html+='<div class="sum-box '+sc2+'">';
     html+='<div class="sum-title '+sc2+'">'+st+'</div>';
     html+='<div class="sum-badges">';
@@ -1358,33 +1381,174 @@ function renderScFlow(){
     if(hC>0) html+='<span class="sb sb-h">&#x4EBA;&#x70BA; '+hC+' &#x9805;</span>';
     if(gC>0) html+='<span class="sb sb-g">&#x7070;&#x8272; '+gC+' &#x9805;</span>';
     html+='</div>';
+    html+=details;
     html+='<div class="sc-script '+sc3.cls+'" style="margin-bottom:10px"><div class="sc-slabel">'+sc3.label+'</div><div class="sc-stxt">'+sc3.txt+'</div></div>';
-    html+='<div class="sc-act-row">'+acts3+'</div>';
+    html+='<div class="sc-act-row">'+acts+'</div>';
     html+='</div>';
   } else {
     html+='<div class="sum-hint">&#x8ACB;&#x5148;&#x5728;&#x4E0A;&#x65B9;&#x9EDE;&#x9078;&#x7B26;&#x5408;&#x7684;&#x9805;&#x76EE;&#xFF0C;&#x7CFB;&#x7D71;&#x5C07;&#x81EA;&#x52D5;&#x7522;&#x751F;&#x7E3D;&#x7D50;&#x5EFA;&#x8B70;</div>';
   }
   html+='</div></div>';
   area.innerHTML=html;
-}
 
-
-
-
-function scSel(key,type,idx,verdict){
-  if(!window._SC_SEL) window._SC_SEL={};
-  var k=key+'-'+type+'-'+idx;
-  if(window._SC_SEL[k]===verdict){delete window._SC_SEL[k];}
-  else{window._SC_SEL[k]=verdict;}
-  renderScFlow();
-}
-function scClearKey(key){
-  if(!window._SC_SEL) return;
-  Object.keys(window._SC_SEL).forEach(function(k){
-    if(k.indexOf(key+'-')===0) delete window._SC_SEL[k];
+  // Attach event listeners via delegation (avoids onclick quote issues)
+  area.querySelectorAll('.sel-opt:not(.na)').forEach(function(el){
+    el.addEventListener('click',function(){
+      var k=el.dataset.key;
+      var t=el.dataset.type;
+      var idx=el.dataset.idx;
+      var v=el.dataset.verdict;
+      if(!window._SC_SEL) window._SC_SEL={};
+      var sk=k+'-'+t+'-'+idx;
+      if(window._SC_SEL[sk]===v){delete window._SC_SEL[sk];}
+      else{window._SC_SEL[sk]=v;}
+      renderScFlow();
+    });
   });
-  renderScFlow();
+  area.querySelectorAll('[data-clearkey]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var k=el.dataset.clearkey;
+      if(window._SC_SEL){
+        Object.keys(window._SC_SEL).forEach(function(sk){
+          if(sk.indexOf(k+'-')===0) delete window._SC_SEL[sk];
+        });
+      }
+      renderScFlow();
+    });
+  });
 }
+
+function renderScAdminPanel(){
+  var key=document.getElementById('sc-admin-prod').value;
+  var d=SC_DATA[key];
+  if(!d) return;
+  var el=document.getElementById('sc-admin-panel');
+  if(!el) return;
+
+  var html='';
+
+  // Cost block
+  html+='<div class="sc-admin-block"><div class="sc-admin-block-title">&#x1F4B0; &#x6210;&#x672C;&#x8A2D;&#x5B9A;</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">';
+  html+='<div><div class="em-label">&#x5546;&#x54C1;&#x6210;&#x672C; (NT$)</div><input class="em-input" id="sc-ci" type="number" value="'+d.costItem+'"></div>';
+  html+='<div><div class="em-label">&#x7DAD;&#x4FEE;&#x8CBB;&#x7528; (NT$)</div><input class="em-input" id="sc-cr" type="number" value="'+d.costRepair+'"></div>';
+  html+='<div><div class="em-label">&#x6210;&#x672C;&#x6BD4; (%)</div><input class="em-input" id="sc-rt" type="number" value="'+d.ratio+'"></div>';
+  html+='</div>';
+  html+='<div style="margin-bottom:8px"><div class="em-label">&#x7DAD;&#x4FEE;&#x985E;&#x578B;</div>';
+  html+='<select class="em-input" id="sc-tp" style="width:auto">';
+  html+='<option value="danger"'+(d.type==='danger'?' selected':'')+'>&#x7DAD;&#x4FEE;&#x8CBB; &gt; &#x6210;&#x672C;&#xFF08;&#x7D05;&#x8272;&#x8B66;&#x793A;&#xFF09;</option>';
+  html+='<option value="success"'+(d.type==='success'?' selected':'')+'>&#x7DAD;&#x4FEE;&#x8CBB; &lt; &#x6210;&#x672C;&#xFF08;&#x7DA0;&#x8272;&#x5B89;&#x5FC3;&#xFF09;</option>';
+  html+='</select></div>';
+  html+='<div style="margin-bottom:8px"><div class="em-label">&#x8B66;&#x793A;&#x6A19;&#x984C;</div><input class="em-input" id="sc-am" value="'+d.alertMsg.replace(/"/g,'&quot;')+'"></div>';
+  html+='<div style="margin-bottom:8px"><div class="em-label">&#x8B66;&#x793A;&#x8AAA;&#x660E;</div><input class="em-input" id="sc-as" value="'+d.alertSub.replace(/"/g,'&quot;')+'"></div>';
+  html+='<button class="sc-save-btn" id="sc-save-cost-btn">&#x5132;&#x5B58;&#x6210;&#x672C;&#x8A2D;&#x5B9A;</button></div>';
+
+  // Step2 block
+  html+='<div class="sc-admin-block"><div class="sc-admin-block-title">&#x2753; Step 2 &mdash; &#x53E3;&#x8FF0;&#x554F;&#x984C;&#x6E05;&#x55AE;</div>';
+  html+='<table class="sc-tbl-edit"><tr><th>&#x554F;&#x984C;</th><th>&#x975E;&#x4EBA;&#x70BA;&#x7279;&#x5FB5;</th><th>&#x4EBA;&#x70BA;&#x7279;&#x5FB5;</th></tr>';
+  for(var i=0;i<d.step2.length;i++){
+    var r2=d.step2[i];
+    html+='<tr>';
+    html+='<td><input id="sc-s2q-'+i+'" value="'+r2[0].replace(/"/g,'&quot;')+'"></td>';
+    html+='<td><input id="sc-s2n-'+i+'" value="'+r2[1].replace(/"/g,'&quot;')+'"></td>';
+    html+='<td><input id="sc-s2h-'+i+'" value="'+r2[2].replace(/"/g,'&quot;')+'"></td>';
+    html+='</tr>';
+  }
+  html+='</table>';
+  html+='<button class="sc-save-btn" id="sc-save-s2-btn" style="margin-top:8px">&#x5132;&#x5B58; Step 2</button></div>';
+
+  // Step3 block
+  html+='<div class="sc-admin-block"><div class="sc-admin-block-title">&#x1F4F7; Step 3 &mdash; &#x7167;&#x7247;&#x7279;&#x5FB5;&#x5224;&#x65B7;</div>';
+  html+='<table class="sc-tbl-edit"><tr><th>&#x640D;&#x50B7;&#x73FE;&#x8C61;</th><th>&#x975E;&#x4EBA;&#x70BA;&#x985E;&#x578B;</th><th>&#x975E;&#x4EBA;&#x70BA;&#x8AAA;&#x660E;</th><th>&#x4EBA;&#x70BA;&#x8AAA;&#x660E;</th></tr>';
+  for(var j=0;j<d.step3.length;j++){
+    var r3=d.step3[j];
+    html+='<tr>';
+    html+='<td><input id="sc-s3p-'+j+'" value="'+r3[0].replace(/"/g,'&quot;')+'"></td>';
+    html+='<td><select id="sc-s3lt-'+j+'"><option value="non"'+(r3[1]==='non'?' selected':'')+'>&#x975E;&#x4EBA;&#x70BA;</option><option value="gray"'+(r3[1]==='gray'?' selected':'')+'>&#x7070;&#x8272;</option><option value="--"'+(r3[1]==='--'?' selected':'')+'>&#x2014;</option></select></td>';
+    html+='<td><input id="sc-s3ld-'+j+'" value="'+(r3[2]||'').replace(/"/g,'&quot;')+'"></td>';
+    html+='<td><input id="sc-s3rd-'+j+'" value="'+(r3[4]||'').replace(/"/g,'&quot;')+'"></td>';
+    html+='</tr>';
+  }
+  html+='</table>';
+  html+='<button class="sc-save-btn" id="sc-save-s3-btn" style="margin-top:8px">&#x5132;&#x5B58; Step 3</button></div>';
+
+  // Scripts block
+  html+='<div class="sc-admin-block"><div class="sc-admin-block-title">&#x1F4AC; Step 5 &mdash; &#x56DE;&#x8986;&#x8A71;&#x8853;</div>';
+  var sKeys=['non','gray','human'];
+  var sLabels=['&#x5EE0;&#x5546;&#x8CAC;&#x4EFB;&#x8A71;&#x8853;','&#x7070;&#x8272;&#x5730;&#x5E36;&#x8A71;&#x8853;','&#x5BA2;&#x6236;&#x8CAC;&#x4EFB;&#x8A71;&#x8853;'];
+  for(var sk=0;sk<sKeys.length;sk++){
+    var sv=sKeys[sk];
+    var sc=d.scripts[sv];
+    html+='<div style="margin-bottom:12px">';
+    html+='<div class="em-label">'+sLabels[sk]+' &mdash; &#x6A19;&#x984C;</div>';
+    html+='<input class="em-input" id="sc-sl-'+sv+'" value="'+sc.label.replace(/"/g,'&quot;')+'" style="margin-bottom:6px">';
+    html+='<div class="em-label">&#x8A71;&#x8853;&#x5167;&#x5BB9;</div>';
+    html+='<textarea class="em-textarea" id="sc-st-'+sv+'" rows="3">'+sc.txt+'</textarea>';
+    html+='</div>';
+  }
+  html+='<button class="sc-save-btn" id="sc-save-sc-btn">&#x5132;&#x5B58;&#x8A71;&#x8853;</button></div>';
+
+  el.innerHTML=html;
+
+  // Bind save buttons
+  document.getElementById('sc-save-cost-btn').addEventListener('click',function(){saveScCost(key);});
+  document.getElementById('sc-save-s2-btn').addEventListener('click',function(){saveScStep2(key);});
+  document.getElementById('sc-save-s3-btn').addEventListener('click',function(){saveScStep3(key);});
+  document.getElementById('sc-save-sc-btn').addEventListener('click',function(){saveScScripts(key);});
+}
+
+function saveScCost(key){
+  var d=SC_DATA[key]; if(!d) return;
+  d.costItem=parseInt(document.getElementById('sc-ci').value)||d.costItem;
+  d.costRepair=parseInt(document.getElementById('sc-cr').value)||d.costRepair;
+  d.ratio=parseInt(document.getElementById('sc-rt').value)||d.ratio;
+  d.type=document.getElementById('sc-tp').value;
+  d.alertMsg=document.getElementById('sc-am').value.trim()||d.alertMsg;
+  d.alertSub=document.getElementById('sc-as').value.trim()||d.alertSub;
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScStep2(key){
+  var d=SC_DATA[key]; if(!d) return;
+  for(var i=0;i<d.step2.length;i++){
+    d.step2[i][0]=document.getElementById('sc-s2q-'+i).value.trim()||d.step2[i][0];
+    d.step2[i][1]=document.getElementById('sc-s2n-'+i).value.trim()||d.step2[i][1];
+    d.step2[i][2]=document.getElementById('sc-s2h-'+i).value.trim()||d.step2[i][2];
+  }
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScStep3(key){
+  var d=SC_DATA[key]; if(!d) return;
+  for(var j=0;j<d.step3.length;j++){
+    d.step3[j][0]=document.getElementById('sc-s3p-'+j).value.trim()||d.step3[j][0];
+    d.step3[j][1]=document.getElementById('sc-s3lt-'+j).value;
+    d.step3[j][2]=document.getElementById('sc-s3ld-'+j).value.trim();
+    d.step3[j][4]=document.getElementById('sc-s3rd-'+j).value.trim();
+  }
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScScripts(key){
+  var d=SC_DATA[key]; if(!d) return;
+  var sKeys=['non','gray','human'];
+  for(var i=0;i<sKeys.length;i++){
+    var sv=sKeys[i];
+    d.scripts[sv].label=document.getElementById('sc-sl-'+sv).value.trim()||d.scripts[sv].label;
+    d.scripts[sv].txt=document.getElementById('sc-st-'+sv).value.trim()||d.scripts[sv].txt;
+  }
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScData(){
+  try{localStorage.setItem('sc_data',JSON.stringify(SC_DATA));}catch(e){}
+}
+function loadScData(){
+  try{
+    var s=localStorage.getItem('sc_data');
+    if(s){
+      var saved=JSON.parse(s);
+      Object.keys(saved).forEach(function(k){if(SC_DATA[k]) Object.assign(SC_DATA[k],saved[k]);});
+    }
+  }catch(e){}
+}
+
 
 /* ── Init ── */
 initSelects();
