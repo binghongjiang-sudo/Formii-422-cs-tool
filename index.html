@@ -226,7 +226,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .sc-flow-body{padding:14px 18px}
 
 /* cost cells */
-.cost-g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.cost-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .cc{background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;padding:9px 12px}
 .cc .cl{font-size:10px;color:#7F8C8D;margin-bottom:2px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .cc .cv{font-size:16px;font-weight:700;color:#1C2833}
@@ -319,6 +319,42 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .sc-tbl-edit input:focus{outline:none;border-color:#1C2833}
 .sc-save-btn{width:100%;padding:9px;font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:#1C2833;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
 .sc-save-btn:hover{background:#2C3E50}
+
+.sel-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);border-bottom:0.5px solid var(--color-border-tertiary)}
+.sel-row:last-child{border-bottom:none}
+.sel-q{padding:8px 10px;font-size:12px;color:var(--color-text-secondary);border-right:0.5px solid var(--color-border-tertiary);line-height:1.5}
+.sel-opt{padding:8px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .1s;line-height:1.5}
+.sel-opt+.sel-opt{border-left:0.5px solid var(--color-border-tertiary)}
+.sel-opt.na{cursor:default;color:var(--color-text-tertiary)}
+.sel-opt:not(.na):hover{background:var(--color-background-secondary)}
+.sel-opt.p-non{background:#E1F5EE;color:#085041;font-weight:500}
+.sel-opt.p-human{background:#FCEBEB;color:#791F1F;font-weight:500}
+.sel-opt.p-gray{background:#FEF9E7;color:#784212;font-weight:500}
+.sel-tbl-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-secondary)}
+.sel-tbl-head div{padding:6px 10px;font-size:11px;font-weight:500;color:var(--color-text-secondary)}
+.sel-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;margin-bottom:10px}
+.chkc{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--color-border-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px}
+.chkc-non{border-color:#085041;background:#085041;color:#fff}
+.chkc-human{border-color:#791F1F;background:#791F1F;color:#fff}
+.chkc-gray{border-color:#784212;background:#784212;color:#fff}
+.tn{display:inline-block;font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;background:#E1F5EE;color:#085041;flex-shrink:0}
+.th2{display:inline-block;font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;background:#FCEBEB;color:#791F1F;flex-shrink:0}
+.tg{display:inline-block;font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;background:#FEF9E7;color:#784212;flex-shrink:0}
+.sc-hint2{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.sum-box{border-radius:var(--border-radius-md);padding:12px 14px;border:0.5px solid;margin-top:10px}
+.sum-box.s-non{background:#E1F5EE;border-color:#9FE1CB}
+.sum-box.s-human{background:#FCEBEB;border-color:#F1948A}
+.sum-box.s-gray{background:#FEF9E7;border-color:#F8C471}
+.sum-title{font-size:13px;font-weight:500;margin-bottom:6px}
+.sum-title.s-non{color:#085041}.sum-title.s-human{color:#791F1F}.sum-title.s-gray{color:#784212}
+.sum-badges{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.sb{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px}
+.sb-n{background:#E1F5EE;color:#085041}
+.sb-h{background:#FCEBEB;color:#791F1F}
+.sb-g{background:#FEF9E7;color:#784212}
+.sum-hint{font-size:11px;color:var(--color-text-tertiary);padding:10px;text-align:center;border:0.5px dashed var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-top:8px}
+.clr-sel-btn{font-size:11px;padding:3px 10px;border-radius:20px;border:0.5px solid #F1948A;background:none;color:#C0392B;cursor:pointer;font-family:inherit;float:right;margin-bottom:6px}
+.clr-sel-btn:hover{background:#FDEDEC}
 </style>
 </head>
 <body>
@@ -388,10 +424,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
         </div>
       </div>
       <div id="summary-area"></div>
-
-    <!-- ══ 情境判斷流程 (自動顯示) ══ -->
-    <div id="sc-flow-area"></div>
-
+      <div id="sc-flow-area"></div>
     </div>
   </div>
 
@@ -817,6 +850,7 @@ function onItemChange(){
   const item=getItem();
   document.getElementById('step2-area').style.display=item?'':'none';
   if(item) renderBoth();
+  renderScFlow();
 }
 
 function mkItem(row,key){
@@ -1214,226 +1248,142 @@ const SC_DATA={
 };
 const SC_SCORES={fan:0,handfan:0,oven:0};
 
+
 function renderScFlow(){
-  const item=getItem();
-  const area=document.getElementById('sc-flow-area');
+  var area=document.getElementById('sc-flow-area');
   if(!area) return;
-  const key=PROD_MAP[item];
+  var item=getItem();
+  var key=PROD_MAP[item];
   if(!key){area.innerHTML='';return;}
-  const d=SC_DATA[key];
-  const cc1='<div class="cc"><div class="cl">商品成本</div><div class="cv">NT$ '+d.costItem.toLocaleString()+'</div></div>';
-  const cc2='<div class="cc '+(d.type==='danger'?'cw':'cok')+'"><div class="cl">預估維修費</div><div class="cv">NT$ '+d.costRepair.toLocaleString()+'</div></div>';
-  const cc3='<div class="cc '+(d.type==='danger'?'cw':'cok')+'"><div class="cl">成本比</div><div class="cv">'+d.ratio+'%</div></div>';
-  const ab='<div class="sc-ab '+d.type+'"><span class="ai">'+(d.type==='danger'?'⚠':'✓')+'</span><div><div class="at">'+d.alertMsg+'</div><div class="ad">'+d.alertSub+'</div></div></div>';
-  let s2rows=d.step2.map(function(r){return '<tr><td>'+r[0]+'</td><td><span class="jt-non">非人為</span> '+r[1]+'</td><td><span class="jt-human">人為</span> '+r[2]+'</td></tr>';}).join('');
-  const s2='<table class="jt"><tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>'+s2rows+'</table>';
-  let s3rows=d.step3.map(function(r){
-    var left=r[1]==='non'?'<span class="jt-non">非人為</span> '+r[2]:r[1]==='gray'?'<span class="jt-gray">灰色</span> '+r[2]:'—';
-    var right=r[3]==='human'?'<span class="jt-human">人為</span> '+r[4]:'—';
-    return '<tr><td>'+r[0]+'</td><td>'+left+'</td><td>'+right+'</td></tr>';
-  }).join('');
-  const s3='<table class="jt"><tr><th>損傷現象</th><th>非人為</th><th>人為</th></tr>'+s3rows+'</table>';
-  var s=SC_SCORES[key];
-  var vt=s>=3?'廠商責任':s>=1?'灰色→鑑定':s===0?'待判斷':'客戶責任';
-  var vc=s>=3?'svd-n':s>=1?'svd-g':s===0?'svd-p':'svd-h';
-  var scoreBar='<div class="sc-score"><span class="sc-slbl">計分</span><span class="sc-snum" id="ssn-'+key+'">'+s+'</span><span class="sc-svd '+vc+'" id="ssv-'+key+'">'+vt+'</span><div class="sc-sbtns"><button class="sc-sbtn" onclick="scInc("'+key+'",1)">＋1 非人為</button><button class="sc-sbtn" onclick="scInc("'+key+'",-1)">－1 人為</button><button class="sc-sbtn" onclick="scRst("'+key+'")" style="color:#95A5A6">重置</button></div></div>';
-  var sk=s>=3?'non':s>=1?'gray':'human';
-  var sc=d.scripts[sk];
-  var scriptHTML='<div class="sc-script '+sc.cls+'"><div class="sc-slabel">'+sc.label+'</div><div class="sc-stxt">'+sc.txt+'</div></div>';
-  var acts=(d.actions[sk]||[]).map(function(a){var p=a.split('|');return '<button class="sc-act '+p[0]+'">'+p[1]+'</button>';}).join('');
-  area.innerHTML='<div class="sc-flow show"><div class="sc-flow-head"><div class="step-num" style="background:#C0392B">!</div><div class="sc-flow-title">情境判斷 — '+d.name+'（外箱完好 / 商品受損）</div></div><div class="sc-flow-body"><span class="sc-sec">成本比對</span><div class="cost-g3">'+cc1+cc2+cc3+'</div>'+ab+'<span class="sc-sec">Step 2 — 口述現象判斷</span>'+s2+'<span class="sc-sec">Step 3 — 照片特徵判斷</span>'+s3+'<span class="sc-sec">Step 4 — 即時計分</span>'+scoreBar+'<span class="sc-sec">Step 5 — 回覆話術</span>'+scriptHTML+'<div class="sc-act-row">'+acts+'</div></div></div>';
-}
+  var d=SC_DATA[key];
+  if(!d){area.innerHTML='';return;}
+  if(!window._SC_SEL) window._SC_SEL={};
+  var SEL=window._SC_SEL;
+  var ct=d.type==='danger'?'cw':'cok';
+  var ai=d.type==='danger'?'&#9888;':'&#10003;';
+  var nC=0,hC=0,gC=0;
+  Object.keys(SEL).forEach(function(k){
+    if(k.indexOf(key+'-')!==0) return;
+    if(SEL[k]==='non') nC++;
+    else if(SEL[k]==='human') hC++;
+    else if(SEL[k]==='gray') gC++;
+  });
+  var total=nC+hC+gC;
+  var ks=JSON.stringify(key);
 
-function scInc(id,v){SC_SCORES[id]+=v;renderScFlow();}
-function scRst(id){SC_SCORES[id]=0;renderScFlow();}
-
-const _orig=onItemChange;
-onItemChange=function(){_orig();renderScFlow();};
-
-
-
-/* ══ EDIT MODAL ══ */
-let editCtx = null;
-let emVerdict = null;
-
-function openEditModal(title, bodyHTML, ctx) {
-  editCtx = ctx;
-  document.getElementById('em-title').textContent = title;
-  document.getElementById('em-body').innerHTML = bodyHTML;
-  document.getElementById('edit-modal').classList.add('show');
-}
-function closeEditModal() {
-  document.getElementById('edit-modal').classList.remove('show');
-  editCtx = null; emVerdict = null;
-}
-function emSelVerdict(v, btn) {
-  emVerdict = v;
-  document.querySelectorAll('.em-vbtn').forEach(b => b.className = 'em-vbtn');
-  btn.className = 'em-vbtn sel-' + v;
-}
-function saveEdit() {
-  if (!editCtx) return;
-  if (editCtx.type === 'item') {
-    const newName = document.getElementById('em-item-name').value.trim();
-    if (!newName) { alert('品項名稱不可為空'); return; }
-    if (DB.items.includes(newName) && newName !== editCtx.oldName) { alert('此名稱已存在'); return; }
-    const idx = DB.items.indexOf(editCtx.oldName);
-    DB.items[idx] = newName;
-    DB.app.forEach(r => { if (r.item === editCtx.oldName) r.item = newName; });
-    DB.func.forEach(r => { if (r.item === editCtx.oldName) r.item = newName; });
-    saveData(); initSelects(); renderItemManageList(); showNotice('save-notice-item');
-  } else if (editCtx.type === 'app') {
-    const r = DB.app[editCtx.idx];
-    r.p = document.getElementById('em-app-p').value.trim() || r.p;
-    r.d = document.getElementById('em-app-d').value.trim() || r.d;
-    r.tip = document.getElementById('em-app-tip').value.trim() || r.tip;
-    if (emVerdict) r.v = emVerdict;
-    saveData(); renderAdminAppList(); showNotice('save-notice-app');
-  } else if (editCtx.type === 'func') {
-    const r = DB.func[editCtx.idx];
-    r.p = document.getElementById('em-func-p').value.trim() || r.p;
-    r.d = document.getElementById('em-func-d').value.trim() || r.d;
-    r.tip = document.getElementById('em-func-tip').value.trim() || r.tip;
-    if (emVerdict) r.v = emVerdict;
-    saveData(); renderAdminFuncList(); showNotice('save-notice-func');
+  function mkSel(type,idx,verdict){
+    return 'onclick="scSel('+ks+','+JSON.stringify(type)+','+idx+','+JSON.stringify(verdict)+')"';
   }
-  closeEditModal();
-}
 
-function editItemName(name) {
-  openEditModal('改名品項',
-    '<div class="em-row"><div class="em-label">品項名稱</div><input class="em-input" id="em-item-name" value="' + name + '" maxlength="20"></div>',
-    { type: 'item', oldName: name }
-  );
-}
+  var html='<div class="sc-flow show">';
+  html+='<div class="sc-flow-head"><div class="step-num" style="background:#C0392B">!</div>';
+  html+='<div class="sc-flow-title">&#x60C5;&#x5883;&#x5224;&#x65B7; &mdash; '+d.name+'&#xFF08;&#x5916;&#x7B71;&#x5B8C;&#x597D; / &#x5546;&#x54C1;&#x53D7;&#x640D;&#xFF09;</div></div>';
+  html+='<div class="sc-flow-body">';
 
-function editAppItem(idx) {
-  const r = DB.app[idx];
-  const vw = r.v==='warn'?'sel-warn':r.v==='amber'?'sel-amber':'sel-ok';
-  const vl = r.v==='warn'?'人為損傷':r.v==='amber'?'灰色地帶':'正常耗損';
-  emVerdict = r.v;
-  openEditModal('編輯外觀項目 — ' + r.item,
-    '<div class="em-row"><div class="em-label">部位名稱</div><input class="em-input" id="em-app-p" value="' + r.p.replace(/"/g,'&quot;') + '"></div>' +
-    '<div class="em-row"><div class="em-label">損傷項目</div><input class="em-input" id="em-app-d" value="' + r.d.replace(/"/g,'&quot;') + '"></div>' +
-    '<div class="em-row"><div class="em-label">判定類別</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict(\'warn\',this)">人為損傷</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict(\'amber\',this)">灰色地帶</button><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict(\'ok\',this)">正常耗損</button></div></div>' +
-    '<div class="em-row"><div class="em-label">處理建議</div><textarea class="em-textarea" id="em-app-tip">' + r.tip + '</textarea></div>',
-    { type: 'app', idx: idx }
-  );
-}
+  html+='<span class="sc-sec">&#x6210;&#x672C;&#x6BD4;&#x5C0D;</span>';
+  html+='<div class="cost-g3">';
+  html+='<div class="cc"><div class="cl">&#x5546;&#x54C1;&#x6210;&#x672C;</div><div class="cv">NT$ '+d.costItem.toLocaleString()+'</div></div>';
+  html+='<div class="cc '+ct+'"><div class="cl">&#x9810;&#x4F30;&#x7DAD;&#x4FEE;&#x8CBB;</div><div class="cv">NT$ '+d.costRepair.toLocaleString()+'</div></div>';
+  html+='<div class="cc '+ct+'"><div class="cl">&#x6210;&#x672C;&#x6BD4;</div><div class="cv">'+d.ratio+'%</div></div>';
+  html+='</div>';
+  html+='<div class="sc-ab '+d.type+'"><span class="ai">'+ai+'</span>';
+  html+='<div><div class="at">'+d.alertMsg+'</div><div class="ad">'+d.alertSub+'</div></div></div>';
 
-function editFuncItem(idx) {
-  const r = DB.func[idx];
-  emVerdict = r.v;
-  openEditModal('編輯功能性項目 — ' + r.item,
-    '<div class="em-row"><div class="em-label">問題現象</div><input class="em-input" id="em-func-p" value="' + r.p.replace(/"/g,'&quot;') + '"></div>' +
-    '<div class="em-row"><div class="em-label">客服確認步驟</div><textarea class="em-textarea" id="em-func-d">' + r.d + '</textarea></div>' +
-    '<div class="em-row"><div class="em-label">可排除狀態</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict(\'ok\',this)">可線上排除</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict(\'amber\',this)">需進一步確認</button><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict(\'warn\',this)">需回倉（安全）</button></div></div>' +
-    '<div class="em-row"><div class="em-label">排除方法/處理建議</div><textarea class="em-textarea" id="em-func-tip">' + r.tip + '</textarea></div>',
-    { type: 'func', idx: idx }
-  );
-}
+  html+='<span class="sc-sec">Step 2 &mdash; &#x53E3;&#x8FF0;&#x73FE;&#x8C61;&#x5224;&#x65B7;</span>';
+  html+='<div class="sc-hint2">&#x9EDE;&#x9078;&#x7B26;&#x5408;&#x7684;&#x9078;&#x9805;&#xFF08;&#x53EF;&#x8907;&#x9078;&#xFF0C;&#x518D;&#x9EDE;&#x4E00;&#x6B21;&#x53D6;&#x6D88;&#xFF09;</div>';
+  html+='<div class="sel-wrap">';
+  html+='<div class="sel-tbl-head"><div>&#x554F;&#x984C;</div><div>&#x975E;&#x4EBA;&#x70BA;&#x7279;&#x5FB5;</div><div>&#x4EBA;&#x70BA;&#x7279;&#x5FB5;</div></div>';
+  for(var i=0;i<d.step2.length;i++){
+    var r=d.step2[i];
+    var k2=key+'-s2-'+i;
+    var sv2=SEL[k2]||'';
+    html+='<div class="sel-row">';
+    html+='<div class="sel-q">'+r[0]+'</div>';
+    html+='<div class="sel-opt'+(sv2==='non'?' p-non':'')+'" '+mkSel('s2',i,'non')+'>';
+    html+='<div class="cc'+(sv2==='non'?' cc-non':'')+'">'+(sv2==='non'?'&#10003;':'')+'</div>';
+    html+='<span class="tn">&#x975E;&#x4EBA;&#x70BA;</span>'+r[1]+'</div>';
+    html+='<div class="sel-opt'+(sv2==='human'?' p-human':'')+'" '+mkSel('s2',i,'human')+'>';
+    html+='<div class="cc'+(sv2==='human'?' cc-human':'')+'">'+(sv2==='human'?'&#10003;':'')+'</div>';
+    html+='<span class="th2">&#x4EBA;&#x70BA;</span>'+r[2]+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
 
-/* ══ SC ADMIN PANEL ══ */
-function renderScAdminPanel() {
-  const key = document.getElementById('sc-admin-prod').value;
-  const d = SC_DATA[key];
-  if (!d) return;
-  const el = document.getElementById('sc-admin-panel');
-
-  // cost section
-  let costHTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">💰 成本設定</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
-    '<div><div class="em-label">商品成本 (NT$)</div><input class="em-input" id="sc-cost-item" value="' + d.costItem + '" type="number"></div>' +
-    '<div><div class="em-label">維修費用 (NT$)</div><input class="em-input" id="sc-cost-repair" value="' + d.costRepair + '" type="number"></div>' +
-    '<div><div class="em-label">成本比 (%)</div><input class="em-input" id="sc-cost-ratio" value="' + d.ratio + '" type="number"></div>' +
-    '</div>' +
-    '<div style="margin-top:8px"><div class="em-label">維修類型</div><select class="em-input" id="sc-cost-type" style="width:auto"><option value="danger"' + (d.type==='danger'?' selected':'') + '>維修費 > 成本（紅色警示）</option><option value="success"' + (d.type==='success'?' selected':'') + '>維修費 < 成本（綠色安心）</option></select></div>' +
-    '<div style="margin-top:8px"><div class="em-label">警示標題</div><input class="em-input" id="sc-alert-msg" value="' + d.alertMsg + '"></div>' +
-    '<div style="margin-top:8px"><div class="em-label">警示說明</div><input class="em-input" id="sc-alert-sub" value="' + d.alertSub + '"></div>' +
-    '<button class="sc-save-btn" onclick="saveScCost(\'' + key + '\')">儲存成本設定</button></div>';
-
-  // step2 section
-  let s2rows = d.step2.map((r,i) =>
-    '<tr><td><input class="sc-tbl-edit" id="sc-s2-q-' + i + '" value="' + r[0].replace(/"/g,'&quot;') + '" style="width:100%"></td>' +
-    '<td><input class="sc-tbl-edit" id="sc-s2-n-' + i + '" value="' + r[1].replace(/"/g,'&quot;') + '" style="width:100%"></td>' +
-    '<td><input class="sc-tbl-edit" id="sc-s2-h-' + i + '" value="' + r[2].replace(/"/g,'&quot;') + '" style="width:100%"></td></tr>'
-  ).join('');
-  let step2HTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">❓ Step 2 — 口述問題清單</div>' +
-    '<table class="sc-tbl-edit"><tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>' + s2rows + '</table>' +
-    '<button class="sc-save-btn" onclick="saveScStep2(\'' + key + '\')">儲存 Step 2</button></div>';
-
-  // step3 section
-  let s3rows = d.step3.map((r,i) =>
-    '<tr><td><input id="sc-s3-p-' + i + '" value="' + r[0].replace(/"/g,'&quot;') + '" style="width:100%"></td>' +
-    '<td><select id="sc-s3-lt-' + i + '" style="font-size:11px;padding:3px"><option value="non"' + (r[1]==='non'?' selected':'') + '>非人為</option><option value="gray"' + (r[1]==='gray'?' selected':'') + '>灰色</option><option value="—"' + (r[1]==='—'?' selected':'') + '>—</option></select> <input id="sc-s3-ld-' + i + '" value="' + r[2].replace(/"/g,'&quot;') + '" style="width:60%"></td>' +
-    '<td><select id="sc-s3-rt-' + i + '" style="font-size:11px;padding:3px"><option value="human"' + (r[3]==='human'?' selected':'') + '>人為</option><option value="—"' + (r[3]==='—'?' selected':'') + '>—</option></select> <input id="sc-s3-rd-' + i + '" value="' + r[4].replace(/"/g,'&quot;') + '" style="width:60%"></td></tr>'
-  ).join('');
-  let step3HTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">📷 Step 3 — 照片特徵判斷</div>' +
-    '<table class="sc-tbl-edit"><tr><th>損傷現象</th><th>非人為說明</th><th>人為說明</th></tr>' + s3rows + '</table>' +
-    '<button class="sc-save-btn" onclick="saveScStep3(\'' + key + '\')">儲存 Step 3</button></div>';
-
-  // scripts section
-  let scriptHTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">💬 Step 5 — 回覆話術</div>';
-  ['non','gray','human'].forEach(sk => {
-    const sc = d.scripts[sk];
-    const labels = {non:'廠商責任話術',gray:'灰色地帶話術',human:'客戶責任話術'};
-    scriptHTML += '<div style="margin-bottom:10px"><div class="em-label">' + labels[sk] + ' — 標題</div><input class="em-input" id="sc-sc-' + sk + '-lbl" value="' + sc.label.replace(/"/g,'&quot;') + '" style="margin-bottom:6px">' +
-      '<div class="em-label">話術內容</div><textarea class="em-textarea" id="sc-sc-' + sk + '-txt" rows="3">' + sc.txt + '</textarea></div>';
-  });
-  scriptHTML += '<button class="sc-save-btn" onclick="saveScScripts(\'' + key + '\')">儲存話術</button></div>';
-
-  el.innerHTML = costHTML + step2HTML + step3HTML + scriptHTML;
-}
-
-function saveScCost(key) {
-  const d = SC_DATA[key];
-  d.costItem = parseInt(document.getElementById('sc-cost-item').value) || d.costItem;
-  d.costRepair = parseInt(document.getElementById('sc-cost-repair').value) || d.costRepair;
-  d.ratio = parseInt(document.getElementById('sc-cost-ratio').value) || d.ratio;
-  d.type = document.getElementById('sc-cost-type').value;
-  d.alertMsg = document.getElementById('sc-alert-msg').value.trim() || d.alertMsg;
-  d.alertSub = document.getElementById('sc-alert-sub').value.trim() || d.alertSub;
-  saveScData(); showNotice('save-notice-sc');
-}
-function saveScStep2(key) {
-  const d = SC_DATA[key];
-  d.step2.forEach((r,i) => {
-    r[0] = document.getElementById('sc-s2-q-'+i).value.trim() || r[0];
-    r[1] = document.getElementById('sc-s2-n-'+i).value.trim() || r[1];
-    r[2] = document.getElementById('sc-s2-h-'+i).value.trim() || r[2];
-  });
-  saveScData(); showNotice('save-notice-sc');
-}
-function saveScStep3(key) {
-  const d = SC_DATA[key];
-  d.step3.forEach((r,i) => {
-    r[0] = document.getElementById('sc-s3-p-'+i).value.trim() || r[0];
-    r[1] = document.getElementById('sc-s3-lt-'+i).value;
-    r[2] = document.getElementById('sc-s3-ld-'+i).value.trim();
-    r[3] = document.getElementById('sc-s3-rt-'+i).value;
-    r[4] = document.getElementById('sc-s3-rd-'+i).value.trim();
-  });
-  saveScData(); showNotice('save-notice-sc');
-}
-function saveScScripts(key) {
-  const d = SC_DATA[key];
-  ['non','gray','human'].forEach(sk => {
-    d.scripts[sk].label = document.getElementById('sc-sc-'+sk+'-lbl').value.trim() || d.scripts[sk].label;
-    d.scripts[sk].txt = document.getElementById('sc-sc-'+sk+'-txt').value.trim() || d.scripts[sk].txt;
-  });
-  saveScData(); showNotice('save-notice-sc');
-}
-function saveScData() {
-  try { localStorage.setItem('sc_data', JSON.stringify(SC_DATA)); } catch(e) {}
-}
-function loadScData() {
-  try {
-    const s = localStorage.getItem('sc_data');
-    if (s) {
-      const saved = JSON.parse(s);
-      Object.keys(saved).forEach(k => { if (SC_DATA[k]) Object.assign(SC_DATA[k], saved[k]); });
+  html+='<span class="sc-sec">Step 3 &mdash; &#x7167;&#x7247;&#x7279;&#x5FB5;&#x5224;&#x65B7;</span>';
+  html+='<div class="sc-hint2">&#x4F9D;&#x7167;&#x7247;&#x5C0D;&#x7167;&#x9EDE;&#x9078;&#x7B26;&#x5408;&#x7279;&#x5FB5;</div>';
+  html+='<div class="sel-wrap">';
+  html+='<div class="sel-tbl-head"><div>&#x640D;&#x50B7;&#x73FE;&#x8C61;</div><div>&#x975E;&#x4EBA;&#x70BA;</div><div>&#x4EBA;&#x70BA;</div></div>';
+  for(var j=0;j<d.step3.length;j++){
+    var s3r=d.step3[j];
+    var k3=key+'-s3-'+j;
+    var sv3=SEL[k3]||'';
+    var isL=s3r[1]==='non'||s3r[1]==='gray';
+    var lv=s3r[1]==='non'?'non':'gray';
+    var lTag=s3r[1]==='non'?'tn':'tg';
+    var lLbl=s3r[1]==='non'?'&#x975E;&#x4EBA;&#x70BA;':'&#x7070;&#x8272;';
+    var lContent=isL&&s3r[2]?('<span class="'+lTag+'">'+lLbl+'</span>'+s3r[2]):'&mdash;';
+    var rContent=s3r[3]==='human'?('<span class="th2">&#x4EBA;&#x70BA;</span>'+s3r[4]):'&mdash;';
+    html+='<div class="sel-row">';
+    html+='<div class="sel-q">'+s3r[0]+'</div>';
+    if(isL){
+      html+='<div class="sel-opt'+(sv3===lv?' p-'+(lv==='non'?'non':'gray'):'')+'" '+mkSel('s3',j,lv)+'>';
+      html+='<div class="cc'+(sv3===lv?' cc-'+(lv==='non'?'non':'gray'):'')+'">'+(sv3===lv?'&#10003;':'')+'</div>'+lContent+'</div>';
+    } else {
+      html+='<div class="sel-opt na">&mdash;</div>';
     }
-  } catch(e) {}
+    if(s3r[3]==='human'){
+      html+='<div class="sel-opt'+(sv3==='human'?' p-human':'')+'" '+mkSel('s3',j,'human')+'>';
+      html+='<div class="cc'+(sv3==='human'?' cc-human':'')+'">'+(sv3==='human'?'&#10003;':'')+'</div>'+rContent+'</div>';
+    } else {
+      html+='<div class="sel-opt na">&mdash;</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+
+  html+='<span class="sc-sec">Step 5 &mdash; &#x7E3D;&#x7D50;&#x5EFA;&#x8B70;</span>';
+  if(total>0){
+    html+='<button class="clr-sel-btn" onclick="scClearKey('+ks+')">&#x6E05;&#x9664;&#x9078;&#x53D6;</button><div style="clear:both"></div>';
+    var verdict='gray',sc2='s-gray',st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x7070;&#x8272;&#x5730;&#x5E36; &mdash; &#x5EFA;&#x8B70;&#x9000;&#x56DE;&#x9451;&#x5B9A;';
+    if(nC>=2&&hC===0){verdict='non';sc2='s-non';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x5EE0;&#x5546;&#x8CAC;&#x4EFB;';}
+    else if(hC>=2&&nC===0){verdict='human';sc2='s-human';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x5BA2;&#x6236;&#x8CAC;&#x4EFB;';}
+    else if(nC>hC&&hC===0){verdict='non';sc2='s-non';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x50BE;&#x5411;&#x5EE0;&#x5546;&#x8CAC;&#x4EFB;';}
+    else if(hC>nC&&nC===0){verdict='human';sc2='s-human';st='&#x5224;&#x65B7;&#x7D50;&#x679C;&#xFF1A;&#x50BE;&#x5411;&#x5BA2;&#x6236;&#x8CAC;&#x4EFB;';}
+    var sc3=d.scripts[verdict];
+    var acts3=(d.actions[verdict]||[]).map(function(a){var p=a.split('|');return '<button class="sc-act '+p[0]+'">'+p[1]+'</button>';}).join('');
+    html+='<div class="sum-box '+sc2+'">';
+    html+='<div class="sum-title '+sc2+'">'+st+'</div>';
+    html+='<div class="sum-badges">';
+    if(nC>0) html+='<span class="sb sb-n">&#x975E;&#x4EBA;&#x70BA; '+nC+' &#x9805;</span>';
+    if(hC>0) html+='<span class="sb sb-h">&#x4EBA;&#x70BA; '+hC+' &#x9805;</span>';
+    if(gC>0) html+='<span class="sb sb-g">&#x7070;&#x8272; '+gC+' &#x9805;</span>';
+    html+='</div>';
+    html+='<div class="sc-script '+sc3.cls+'" style="margin-bottom:10px"><div class="sc-slabel">'+sc3.label+'</div><div class="sc-stxt">'+sc3.txt+'</div></div>';
+    html+='<div class="sc-act-row">'+acts3+'</div>';
+    html+='</div>';
+  } else {
+    html+='<div class="sum-hint">&#x8ACB;&#x5148;&#x5728;&#x4E0A;&#x65B9;&#x9EDE;&#x9078;&#x7B26;&#x5408;&#x7684;&#x9805;&#x76EE;&#xFF0C;&#x7CFB;&#x7D71;&#x5C07;&#x81EA;&#x52D5;&#x7522;&#x751F;&#x7E3D;&#x7D50;&#x5EFA;&#x8B70;</div>';
+  }
+  html+='</div></div>';
+  area.innerHTML=html;
+}
+
+
+
+
+function scSel(key,type,idx,verdict){
+  if(!window._SC_SEL) window._SC_SEL={};
+  var k=key+'-'+type+'-'+idx;
+  if(window._SC_SEL[k]===verdict){delete window._SC_SEL[k];}
+  else{window._SC_SEL[k]=verdict;}
+  renderScFlow();
+}
+function scClearKey(key){
+  if(!window._SC_SEL) return;
+  Object.keys(window._SC_SEL).forEach(function(k){
+    if(k.indexOf(key+'-')===0) delete window._SC_SEL[k];
+  });
+  renderScFlow();
 }
 
 /* ── Init ── */
