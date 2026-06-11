@@ -280,6 +280,45 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .sc-act.danger{background:#FDEDEC;border-color:#F1948A;color:#C0392B}
 .sc-act.ok{background:#EAFAF1;border-color:#A9DFBF;color:#1E8449}
 .sc-sec{font-size:10px;font-weight:700;color:#95A5A6;letter-spacing:.07em;text-transform:uppercase;margin:0 0 7px;display:block}
+
+/* ══ Edit styles ══ */
+.edit-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.edit-modal-overlay.show{display:flex}
+.edit-modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.em-title{font-size:14px;font-weight:700;color:#1C2833;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #F0F2F5}
+.em-row{margin-bottom:12px}
+.em-label{font-size:11px;font-weight:700;color:#5D6D7E;margin-bottom:4px}
+.em-input{width:100%;padding:8px 11px;font-size:13px;font-family:'Noto Sans TC',sans-serif;border:1.5px solid #D5D8DC;border-radius:8px;color:#1C2833}
+.em-input:focus{outline:none;border-color:#1C2833}
+.em-textarea{width:100%;padding:8px 11px;font-size:12px;font-family:'Noto Sans TC',sans-serif;border:1.5px solid #D5D8DC;border-radius:8px;color:#1C2833;resize:vertical;min-height:70px;line-height:1.6}
+.em-textarea:focus{outline:none;border-color:#1C2833}
+.em-verdict{display:flex;gap:6px;margin-top:4px}
+.em-vbtn{flex:1;padding:7px 4px;font-size:11px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border:1.5px solid #E8EAED;border-radius:8px;background:#fff;cursor:pointer;text-align:center}
+.em-vbtn.sel-warn{background:#FDEDEC;border-color:#E74C3C;color:#C0392B}
+.em-vbtn.sel-amber{background:#F1EFE8;border-color:#888780;color:#444441}
+.em-vbtn.sel-ok{background:#EAFAF1;border-color:#2ECC71;color:#1E8449}
+.em-btns{display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid #F0F2F5}
+.em-save{flex:1;padding:10px;font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:#1C2833;color:#fff;border:none;border-radius:8px;cursor:pointer}
+.em-save:hover{background:#2C3E50}
+.em-cancel{padding:10px 16px;font-size:13px;font-family:'Noto Sans TC',sans-serif;background:none;border:1.5px solid #D5D8DC;border-radius:8px;cursor:pointer;color:#7F8C8D}
+.em-cancel:hover{background:#F8F9FA}
+.btn-edit-item{background:none;border:1px solid #AED6F1;color:#1A5276;font-size:11px;font-family:'Noto Sans TC',sans-serif;padding:4px 10px;border-radius:6px;cursor:pointer;margin-right:6px}
+.btn-edit-item:hover{background:#EBF5FB}
+.edit-btn-sm{background:none;border:none;cursor:pointer;color:#AED6F1;font-size:14px;padding:0 3px;line-height:1;flex-shrink:0;margin-top:1px}
+.edit-btn-sm:hover{color:#1A5276}
+/* sc admin tab */
+.sc-admin-section{padding:14px 18px}
+.sc-prod-select{margin-bottom:14px}
+.sc-admin-block{background:#F8F9FA;border-radius:10px;border:1px solid #E8EAED;padding:14px;margin-bottom:12px}
+.sc-admin-block-title{font-size:12px;font-weight:700;color:#1C2833;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sc-tbl-edit{width:100%;border-collapse:collapse;font-size:12px}
+.sc-tbl-edit th{background:#F0F3F4;padding:6px 8px;text-align:left;font-size:11px;font-weight:700;color:#5D6D7E;border-bottom:1px solid #E8EAED}
+.sc-tbl-edit td{padding:6px 8px;border-bottom:1px solid #F0F2F5;vertical-align:middle}
+.sc-tbl-edit tr:last-child td{border-bottom:none}
+.sc-tbl-edit input{width:100%;padding:5px 8px;font-size:11px;font-family:'Noto Sans TC',sans-serif;border:1px solid #D5D8DC;border-radius:6px}
+.sc-tbl-edit input:focus{outline:none;border-color:#1C2833}
+.sc-save-btn{width:100%;padding:9px;font-size:12px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:#1C2833;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-top:8px}
+.sc-save-btn:hover{background:#2C3E50}
 </style>
 </head>
 <body>
@@ -366,6 +405,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
           <button class="admin-tab on" id="atab-item" onclick="switchAdminTab('item')">品項管理</button>
           <button class="admin-tab" id="atab-app" onclick="switchAdminTab('app')">新增外觀項目</button>
           <button class="admin-tab" id="atab-func" onclick="switchAdminTab('func')">新增功能性項目</button>
+          <button class="admin-tab" id="atab-sc" onclick="switchAdminTab('sc')">情境判斷設定</button>
         </div>
       </div>
 
@@ -705,6 +745,7 @@ function resetToDefault(){
   localStorage.removeItem('cs_tool_data');
   DB=JSON.parse(JSON.stringify(DEFAULT_DATA));
   initSelects();
+loadScData();
   renderBoth();
   renderAdminLists();
   showNotice('save-notice-item');
@@ -881,7 +922,7 @@ function toggleAdmin(){
 
 function switchAdminTab(t){
   adminTab=t;
-  ['item','app','func'].forEach(x=>{
+  ['item','app','func','sc'].forEach(x=>{
     document.getElementById('atab-'+x).className='admin-tab'+(x===t?' on':'');
     document.getElementById('admin-tab-'+x).style.display=x===t?'block':'none';
   });
@@ -929,7 +970,7 @@ function renderItemManageList(){
     const fc=DB.func.filter(r=>r.item===name).length;
     return `<div class="item-manage-row">
       <div><div class="item-manage-name">${name}</div><div class="item-manage-count">外觀 ${ac} 項・功能性 ${fc} 項</div></div>
-      <button class="btn-del-item" onclick="delItem('${name}')">刪除</button>
+      <button class="btn-edit-item" onclick="editItemName('${name}')">改名</button><button class="btn-del-item" onclick="delItem('${name}')">刪除</button>
     </div>`;
   }).join('');
 }
@@ -972,7 +1013,7 @@ function renderAdminAppList(){
         <div class="admin-item-sub">${vl}</div>
         <div class="admin-item-tip">處理建議：${r.tip}</div>
       </div>
-      <button class="del-btn" onclick="delAppItem(${realIdx})" title="刪除">×</button>
+      <button class="edit-btn-sm" onclick="editAppItem(${realIdx})" title="編輯">✏</button><button class="del-btn" onclick="delAppItem(${realIdx})" title="刪除">×</button>
     </div>`;
   }).join('');
 }
@@ -1015,7 +1056,7 @@ function renderAdminFuncList(){
         <div class="admin-item-sub">${r.d}</div>
         <div class="admin-item-sub" style="margin-top:2px">${vl}　・　${r.tip}</div>
       </div>
-      <button class="del-btn" onclick="delFuncItem(${realIdx})" title="刪除">×</button>
+      <button class="edit-btn-sm" onclick="editFuncItem(${realIdx})" title="編輯">✏</button><button class="del-btn" onclick="delFuncItem(${realIdx})" title="刪除">×</button>
     </div>`;
   }).join('');
 }
@@ -1111,8 +1152,206 @@ const _orig=onItemChange;
 onItemChange=function(){_orig();renderScFlow();};
 
 
+
+/* ══ EDIT MODAL ══ */
+let editCtx = null;
+let emVerdict = null;
+
+function openEditModal(title, bodyHTML, ctx) {
+  editCtx = ctx;
+  document.getElementById('em-title').textContent = title;
+  document.getElementById('em-body').innerHTML = bodyHTML;
+  document.getElementById('edit-modal').classList.add('show');
+}
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('show');
+  editCtx = null; emVerdict = null;
+}
+function emSelVerdict(v, btn) {
+  emVerdict = v;
+  document.querySelectorAll('.em-vbtn').forEach(b => b.className = 'em-vbtn');
+  btn.className = 'em-vbtn sel-' + v;
+}
+function saveEdit() {
+  if (!editCtx) return;
+  if (editCtx.type === 'item') {
+    const newName = document.getElementById('em-item-name').value.trim();
+    if (!newName) { alert('品項名稱不可為空'); return; }
+    if (DB.items.includes(newName) && newName !== editCtx.oldName) { alert('此名稱已存在'); return; }
+    const idx = DB.items.indexOf(editCtx.oldName);
+    DB.items[idx] = newName;
+    DB.app.forEach(r => { if (r.item === editCtx.oldName) r.item = newName; });
+    DB.func.forEach(r => { if (r.item === editCtx.oldName) r.item = newName; });
+    saveData(); initSelects(); renderItemManageList(); showNotice('save-notice-item');
+  } else if (editCtx.type === 'app') {
+    const r = DB.app[editCtx.idx];
+    r.p = document.getElementById('em-app-p').value.trim() || r.p;
+    r.d = document.getElementById('em-app-d').value.trim() || r.d;
+    r.tip = document.getElementById('em-app-tip').value.trim() || r.tip;
+    if (emVerdict) r.v = emVerdict;
+    saveData(); renderAdminAppList(); showNotice('save-notice-app');
+  } else if (editCtx.type === 'func') {
+    const r = DB.func[editCtx.idx];
+    r.p = document.getElementById('em-func-p').value.trim() || r.p;
+    r.d = document.getElementById('em-func-d').value.trim() || r.d;
+    r.tip = document.getElementById('em-func-tip').value.trim() || r.tip;
+    if (emVerdict) r.v = emVerdict;
+    saveData(); renderAdminFuncList(); showNotice('save-notice-func');
+  }
+  closeEditModal();
+}
+
+function editItemName(name) {
+  openEditModal('改名品項',
+    '<div class="em-row"><div class="em-label">品項名稱</div><input class="em-input" id="em-item-name" value="' + name + '" maxlength="20"></div>',
+    { type: 'item', oldName: name }
+  );
+}
+
+function editAppItem(idx) {
+  const r = DB.app[idx];
+  const vw = r.v==='warn'?'sel-warn':r.v==='amber'?'sel-amber':'sel-ok';
+  const vl = r.v==='warn'?'人為損傷':r.v==='amber'?'灰色地帶':'正常耗損';
+  emVerdict = r.v;
+  openEditModal('編輯外觀項目 — ' + r.item,
+    '<div class="em-row"><div class="em-label">部位名稱</div><input class="em-input" id="em-app-p" value="' + r.p.replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="em-row"><div class="em-label">損傷項目</div><input class="em-input" id="em-app-d" value="' + r.d.replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="em-row"><div class="em-label">判定類別</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict('warn',this)">人為損傷</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict('amber',this)">灰色地帶</button><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict('ok',this)">正常耗損</button></div></div>' +
+    '<div class="em-row"><div class="em-label">處理建議</div><textarea class="em-textarea" id="em-app-tip">' + r.tip + '</textarea></div>',
+    { type: 'app', idx: idx }
+  );
+}
+
+function editFuncItem(idx) {
+  const r = DB.func[idx];
+  emVerdict = r.v;
+  openEditModal('編輯功能性項目 — ' + r.item,
+    '<div class="em-row"><div class="em-label">問題現象</div><input class="em-input" id="em-func-p" value="' + r.p.replace(/"/g,'&quot;') + '"></div>' +
+    '<div class="em-row"><div class="em-label">客服確認步驟</div><textarea class="em-textarea" id="em-func-d">' + r.d + '</textarea></div>' +
+    '<div class="em-row"><div class="em-label">可排除狀態</div><div class="em-verdict"><button class="em-vbtn'+(r.v==='ok'?' sel-ok':'')+'" onclick="emSelVerdict('ok',this)">可線上排除</button><button class="em-vbtn'+(r.v==='amber'?' sel-amber':'')+'" onclick="emSelVerdict('amber',this)">需進一步確認</button><button class="em-vbtn'+(r.v==='warn'?' sel-warn':'')+'" onclick="emSelVerdict('warn',this)">需回倉（安全）</button></div></div>' +
+    '<div class="em-row"><div class="em-label">排除方法/處理建議</div><textarea class="em-textarea" id="em-func-tip">' + r.tip + '</textarea></div>',
+    { type: 'func', idx: idx }
+  );
+}
+
+/* ══ SC ADMIN PANEL ══ */
+function renderScAdminPanel() {
+  const key = document.getElementById('sc-admin-prod').value;
+  const d = SC_DATA[key];
+  if (!d) return;
+  const el = document.getElementById('sc-admin-panel');
+
+  // cost section
+  let costHTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">💰 成本設定</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">' +
+    '<div><div class="em-label">商品成本 (NT$)</div><input class="em-input" id="sc-cost-item" value="' + d.costItem + '" type="number"></div>' +
+    '<div><div class="em-label">維修費用 (NT$)</div><input class="em-input" id="sc-cost-repair" value="' + d.costRepair + '" type="number"></div>' +
+    '<div><div class="em-label">成本比 (%)</div><input class="em-input" id="sc-cost-ratio" value="' + d.ratio + '" type="number"></div>' +
+    '</div>' +
+    '<div style="margin-top:8px"><div class="em-label">維修類型</div><select class="em-input" id="sc-cost-type" style="width:auto"><option value="danger"' + (d.type==='danger'?' selected':'') + '>維修費 > 成本（紅色警示）</option><option value="success"' + (d.type==='success'?' selected':'') + '>維修費 < 成本（綠色安心）</option></select></div>' +
+    '<div style="margin-top:8px"><div class="em-label">警示標題</div><input class="em-input" id="sc-alert-msg" value="' + d.alertMsg + '"></div>' +
+    '<div style="margin-top:8px"><div class="em-label">警示說明</div><input class="em-input" id="sc-alert-sub" value="' + d.alertSub + '"></div>' +
+    '<button class="sc-save-btn" onclick="saveScCost('' + key + '')">儲存成本設定</button></div>';
+
+  // step2 section
+  let s2rows = d.step2.map((r,i) =>
+    '<tr><td><input class="sc-tbl-edit" id="sc-s2-q-' + i + '" value="' + r[0].replace(/"/g,'&quot;') + '" style="width:100%"></td>' +
+    '<td><input class="sc-tbl-edit" id="sc-s2-n-' + i + '" value="' + r[1].replace(/"/g,'&quot;') + '" style="width:100%"></td>' +
+    '<td><input class="sc-tbl-edit" id="sc-s2-h-' + i + '" value="' + r[2].replace(/"/g,'&quot;') + '" style="width:100%"></td></tr>'
+  ).join('');
+  let step2HTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">❓ Step 2 — 口述問題清單</div>' +
+    '<table class="sc-tbl-edit"><tr><th>問題</th><th>非人為特徵</th><th>人為特徵</th></tr>' + s2rows + '</table>' +
+    '<button class="sc-save-btn" onclick="saveScStep2('' + key + '')">儲存 Step 2</button></div>';
+
+  // step3 section
+  let s3rows = d.step3.map((r,i) =>
+    '<tr><td><input id="sc-s3-p-' + i + '" value="' + r[0].replace(/"/g,'&quot;') + '" style="width:100%"></td>' +
+    '<td><select id="sc-s3-lt-' + i + '" style="font-size:11px;padding:3px"><option value="non"' + (r[1]==='non'?' selected':'') + '>非人為</option><option value="gray"' + (r[1]==='gray'?' selected':'') + '>灰色</option><option value="—"' + (r[1]==='—'?' selected':'') + '>—</option></select> <input id="sc-s3-ld-' + i + '" value="' + r[2].replace(/"/g,'&quot;') + '" style="width:60%"></td>' +
+    '<td><select id="sc-s3-rt-' + i + '" style="font-size:11px;padding:3px"><option value="human"' + (r[3]==='human'?' selected':'') + '>人為</option><option value="—"' + (r[3]==='—'?' selected':'') + '>—</option></select> <input id="sc-s3-rd-' + i + '" value="' + r[4].replace(/"/g,'&quot;') + '" style="width:60%"></td></tr>'
+  ).join('');
+  let step3HTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">📷 Step 3 — 照片特徵判斷</div>' +
+    '<table class="sc-tbl-edit"><tr><th>損傷現象</th><th>非人為說明</th><th>人為說明</th></tr>' + s3rows + '</table>' +
+    '<button class="sc-save-btn" onclick="saveScStep3('' + key + '')">儲存 Step 3</button></div>';
+
+  // scripts section
+  let scriptHTML = '<div class="sc-admin-block"><div class="sc-admin-block-title">💬 Step 5 — 回覆話術</div>';
+  ['non','gray','human'].forEach(sk => {
+    const sc = d.scripts[sk];
+    const labels = {non:'廠商責任話術',gray:'灰色地帶話術',human:'客戶責任話術'};
+    scriptHTML += '<div style="margin-bottom:10px"><div class="em-label">' + labels[sk] + ' — 標題</div><input class="em-input" id="sc-sc-' + sk + '-lbl" value="' + sc.label.replace(/"/g,'&quot;') + '" style="margin-bottom:6px">' +
+      '<div class="em-label">話術內容</div><textarea class="em-textarea" id="sc-sc-' + sk + '-txt" rows="3">' + sc.txt + '</textarea></div>';
+  });
+  scriptHTML += '<button class="sc-save-btn" onclick="saveScScripts('' + key + '')">儲存話術</button></div>';
+
+  el.innerHTML = costHTML + step2HTML + step3HTML + scriptHTML;
+}
+
+function saveScCost(key) {
+  const d = SC_DATA[key];
+  d.costItem = parseInt(document.getElementById('sc-cost-item').value) || d.costItem;
+  d.costRepair = parseInt(document.getElementById('sc-cost-repair').value) || d.costRepair;
+  d.ratio = parseInt(document.getElementById('sc-cost-ratio').value) || d.ratio;
+  d.type = document.getElementById('sc-cost-type').value;
+  d.alertMsg = document.getElementById('sc-alert-msg').value.trim() || d.alertMsg;
+  d.alertSub = document.getElementById('sc-alert-sub').value.trim() || d.alertSub;
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScStep2(key) {
+  const d = SC_DATA[key];
+  d.step2.forEach((r,i) => {
+    r[0] = document.getElementById('sc-s2-q-'+i).value.trim() || r[0];
+    r[1] = document.getElementById('sc-s2-n-'+i).value.trim() || r[1];
+    r[2] = document.getElementById('sc-s2-h-'+i).value.trim() || r[2];
+  });
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScStep3(key) {
+  const d = SC_DATA[key];
+  d.step3.forEach((r,i) => {
+    r[0] = document.getElementById('sc-s3-p-'+i).value.trim() || r[0];
+    r[1] = document.getElementById('sc-s3-lt-'+i).value;
+    r[2] = document.getElementById('sc-s3-ld-'+i).value.trim();
+    r[3] = document.getElementById('sc-s3-rt-'+i).value;
+    r[4] = document.getElementById('sc-s3-rd-'+i).value.trim();
+  });
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScScripts(key) {
+  const d = SC_DATA[key];
+  ['non','gray','human'].forEach(sk => {
+    d.scripts[sk].label = document.getElementById('sc-sc-'+sk+'-lbl').value.trim() || d.scripts[sk].label;
+    d.scripts[sk].txt = document.getElementById('sc-sc-'+sk+'-txt').value.trim() || d.scripts[sk].txt;
+  });
+  saveScData(); showNotice('save-notice-sc');
+}
+function saveScData() {
+  try { localStorage.setItem('sc_data', JSON.stringify(SC_DATA)); } catch(e) {}
+}
+function loadScData() {
+  try {
+    const s = localStorage.getItem('sc_data');
+    if (s) {
+      const saved = JSON.parse(s);
+      Object.keys(saved).forEach(k => { if (SC_DATA[k]) Object.assign(SC_DATA[k], saved[k]); });
+    }
+  } catch(e) {}
+}
+
 /* ── Init ── */
 initSelects();
 </script>
+
+<!-- Edit Modal -->
+<div class="edit-modal-overlay" id="edit-modal">
+  <div class="edit-modal">
+    <div class="em-title" id="em-title">編輯項目</div>
+    <div id="em-body"></div>
+    <div class="em-btns">
+      <button class="em-cancel" onclick="closeEditModal()">取消</button>
+      <button class="em-save" onclick="saveEdit()">儲存</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
