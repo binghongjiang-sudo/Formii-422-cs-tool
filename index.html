@@ -1391,7 +1391,8 @@ function renderScFlow(){
   html+='</div></div>';
   area.innerHTML=html;
 
-  // Attach event listeners via delegation (avoids onclick quote issues)
+  // Attach event listeners after DOM update
+  setTimeout(function(){
   area.querySelectorAll('.sel-opt:not(.na)').forEach(function(el){
     el.addEventListener('click',function(){
       var k=el.dataset.key;
@@ -1416,6 +1417,7 @@ function renderScFlow(){
       renderScFlow();
     });
   });
+  },0);
 }
 
 function renderScAdminPanel(){
