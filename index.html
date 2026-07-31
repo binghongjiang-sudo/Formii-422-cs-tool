@@ -603,7 +603,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=2;
+const DATA_VERSION=3;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -720,12 +720,32 @@ const DEFAULT_DATA={
   ],
   func:[
     /* ══ 通用功能 ══ */
-    {item:"通用",p:"完全無法啟動",d:"確認插頭插好；換插座測試；確認開關是否正確撥動",v:"ok",tip:"重新插電，確認插座有電"},
-    {item:"通用",p:"啟動後立即斷電",d:"確認是否觸發過熱保護；放置 10 分鐘冷卻後重試",v:"ok",tip:"散熱冷卻後重新啟動"},
+    {item:"通用",p:"完全無法啟動",steps:[
+      {q:"換一個確認有電的插座測試，仍然無法啟動？",yL:"換座仍不動",nL:"換座後可啟動",yes:null,no:{type:"ok",tip:"插座問題，確認插座供電正常後重試"}},
+      {q:"電源線外觀有無損傷（破皮/燒焦/壓折）？",yL:"有損傷",nL:"外觀正常",yes:{type:"warn",tip:"安全疑慮：立即停止使用，安排回倉"},no:null},
+      {q:"按下開機鍵後，指示燈是否有任何亮起或閃爍？",yL:"有亮起或閃爍",nL:"完全無任何反應",yes:null,no:null},
+      {q:"靜置5分鐘後重新插電開機，仍然無法啟動？",yL:"仍無法啟動",nL:"靜置後可啟動",yes:{type:"repair",cause:"電源板或開關故障",tip:"已排除插座與電源線問題，需送修檢測"},no:{type:"ok",tip:"暫時性過熱保護啟動，已自動恢復正常"}}
+    ]},
+    {item:"通用",p:"啟動後立即斷電",steps:[
+      {q:"斷電前是否已連續使用超過1小時？",yL:"是，長時間使用",nL:"剛啟動就斷電",yes:{type:"ok",tip:"過熱保護啟動，冷卻30分鐘後重試，確認使用環境通風良好"},no:null},
+      {q:"斷電前是否伴有異味或燒焦氣味？",yL:"有異味",nL:"無異味",yes:{type:"warn",tip:"安全疑慮：立即停止使用，安排回倉"},no:null},
+      {q:"確認產品四周通風良好後重新開機，仍立即斷電？",yL:"仍立即斷電",nL:"通風後正常",yes:null,no:{type:"ok",tip:"通風不足導致過熱保護，確保使用環境通風"}},
+      {q:"換插座冷卻後重試，仍然立即斷電？",yL:"仍立即斷電",nL:"換座後正常",yes:{type:"repair",cause:"電源保護電路異常",tip:"需送修檢測電源保護電路"},no:{type:"ok",tip:"原插座電壓不穩，建議使用正常插座"}}
+    ]},
     {item:"通用",p:"電源線過熱燙手",d:"立即停止使用；確認電源線有無破損或壓折",v:"warn",tip:"【非人為/安全】安排回倉，立即停止使用"},
     {item:"通用",p:"異味（燃燒味）",d:"立即關機；確認外觀有無燒焦痕跡",v:"warn",tip:"【安全疑慮】安排回倉"},
-    {item:"通用",p:"按鍵無反應",d:"逐一測試各按鍵；確認是否特定按鍵故障",v:"amber",tip:"【灰色】記錄哪個按鍵無反應後安排回倉"},
-    {item:"通用",p:"顯示異常或亂碼",d:"確認電源是否穩定；嘗試重新插電重置",v:"ok",tip:"重新插電後觀察是否恢復正常"},
+    {item:"通用",p:"按鍵無反應",steps:[
+      {q:"是否只有特定一個按鍵無反應，其他按鍵正常？",yL:"特定按鍵無反應",nL:"所有按鍵皆無反應",yes:null,no:null},
+      {q:"無反應的按鍵外觀是否有明顯破損或凹陷？",yL:"有破損",nL:"外觀正常",yes:{type:"amber",tip:"按鍵人為損傷，記錄並安排回倉確認"},no:null},
+      {q:"重新插電後，按鍵仍然無反應？",yL:"仍無反應",nL:"重新插電後正常",yes:null,no:{type:"ok",tip:"重新插電後正常，可能為靜電干擾"}},
+      {q:"更換插座測試，按鍵仍無反應？",yL:"仍無反應",nL:"換座後正常",yes:{type:"repair",cause:"控制板或按鍵故障",tip:"需送修檢測控制板"},no:{type:"ok",tip:"原插座電壓不穩，建議更換插座"}}
+    ]},
+    {item:"通用",p:"顯示異常或亂碼",steps:[
+      {q:"拔除電源等待10秒後重新插電，顯示是否恢復正常？",yL:"恢復正常",nL:"仍然異常",yes:{type:"ok",tip:"重啟後正常，可能為系統暫時錯誤，繼續觀察"},no:null},
+      {q:"顯示異常是否為持續性（非偶發）？",yL:"持續異常",nL:"偶爾才發生",yes:null,no:{type:"amber",tip:"偶發性異常，請記錄現象與發生頻率，繼續觀察"}},
+      {q:"是否同時伴有功能完全無法操作？",yL:"功能也無法操作",nL:"僅顯示異常，功能正常",yes:null,no:{type:"amber",tip:"僅顯示板異常，記錄後安排回倉確認"}},
+      {q:"換插座並重試，顯示仍然異常？",yL:"仍然異常",nL:"換座後正常",yes:{type:"repair",cause:"顯示控制板故障",tip:"需送修檢測顯示控制板"},no:{type:"ok",tip:"電源不穩造成，建議使用穩壓插座"}}
+    ]},
     /* ══ 吹風機 ══ */
     {item:"吹風機",p:"出風量明顯減少",d:"確認進風口濾網是否堵塞；清潔濾網後重新測試",v:"ok",tip:"【操作/耗損】清潔濾網後重新使用"},
     {item:"吹風機",p:"不加熱只送風",d:"確認加熱鍵是否正確切換；測試各功能鍵",v:"ok",tip:"【操作問題】重新操作加熱模式"},
@@ -1465,13 +1485,16 @@ function renderAdminFuncList(){
     const vc=r.v==='warn'?'v-warn':r.v==='amber'?'v-amber':'v-ok';
     const vl=r.v==='warn'?'需回倉（安全）':r.v==='amber'?'需進一步確認':'可線上排除';
     const tagCls=r.item==='通用'?'itag-common':'itag-item';
-    return `<div class="admin-item ${vc}">
+    const isWizard=!!r.steps;
+    const subLine=isWizard?`多步驟判斷（${r.steps.length}題）`:(r.d||'');
+    const vcLine=isWizard?'逐步引導判斷':`${vl}　・　${r.tip||''}`;
+    return `<div class="admin-item ${isWizard?'v-amber':vc}">
       <div class="admin-item-body">
-        <div class="admin-item-title"><span class="itag ${tagCls}">${r.item}</span>${r.p}</div>
-        <div class="admin-item-sub">${r.d}</div>
-        <div class="admin-item-sub" style="margin-top:2px">${vl}　・　${r.tip}</div>
+        <div class="admin-item-title"><span class="itag ${tagCls}">${r.item}</span>${r.p}${isWizard?'　<span style="font-size:11px;color:#7F8C8D;font-weight:400">🔀 步驟判斷</span>':''}</div>
+        <div class="admin-item-sub">${subLine}</div>
+        <div class="admin-item-sub" style="margin-top:2px">${vcLine}</div>
       </div>
-      <button class="edit-btn-sm" onclick="editFuncItem(${realIdx})" title="編輯">✏</button><button class="del-btn" onclick="delFuncItem(${realIdx})" title="刪除">×</button>
+      <button class="del-btn" onclick="delFuncItem(${realIdx})" title="刪除">×</button>
     </div>`;
   }).join('');
 }
