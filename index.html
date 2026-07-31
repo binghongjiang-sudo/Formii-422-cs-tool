@@ -603,6 +603,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
+const DATA_VERSION=2;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -908,12 +909,19 @@ const DEFAULT_DATA={
 function loadData(){
   try{
     const s=localStorage.getItem('cs_tool_data');
-    if(s) return JSON.parse(s);
+    if(s){
+      const d=JSON.parse(s);
+      if((d._v||1)<DATA_VERSION){
+        localStorage.removeItem('cs_tool_data');
+        return JSON.parse(JSON.stringify(DEFAULT_DATA));
+      }
+      return d;
+    }
   }catch(e){}
   return JSON.parse(JSON.stringify(DEFAULT_DATA));
 }
 function saveData(){
-  try{ localStorage.setItem('cs_tool_data',JSON.stringify(DB)); }catch(e){}
+  try{ DB._v=DATA_VERSION; localStorage.setItem('cs_tool_data',JSON.stringify(DB)); }catch(e){}
 }
 function resetToDefault(){
   if(!confirm('確定要還原為預設資料嗎？所有自訂新增的項目將會刪除。')) return;
