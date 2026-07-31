@@ -436,6 +436,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
       <div class="card-body" style="padding-bottom:0">
         <div class="admin-tabs">
           <button class="admin-tab on" id="atab-item" onclick="switchAdminTab('item')">品項管理</button>
+          <button class="admin-tab" id="atab-price" onclick="switchAdminTab('price')">💰 售價管理</button>
           <button class="admin-tab" id="atab-app" onclick="switchAdminTab('app')">新增外觀項目</button>
           <button class="admin-tab" id="atab-func" onclick="switchAdminTab('func')">新增功能性項目</button>
           <button class="admin-tab" id="atab-sc" onclick="switchAdminTab('sc')">情境判斷設定</button>
@@ -460,6 +461,13 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
         <div class="divider"></div>
         <div class="form-label" style="margin-bottom:8px">現有品項</div>
         <div id="item-manage-list"></div>
+      </div>
+
+      <!-- Tab: 售價管理 -->
+      <div id="admin-tab-price" class="card-body" style="display:none">
+        <div class="save-notice" id="save-notice-price">售價已儲存</div>
+        <p style="font-size:12px;color:#5D6D7E;margin-bottom:12px;line-height:1.7">商品售價變更後在此修改，用於送修判斷成本比對計算。</p>
+        <div id="price-list"></div>
       </div>
 
       <!-- Tab: 新增外觀項目 -->
@@ -596,7 +604,12 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
 const DEFAULT_DATA={
-  items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機"],
+  items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
+  prices:{
+    "Formii 7吋擺頭空氣循環扇":{price:890,inspFee:600},
+    "Formii 12吋全方位DC直流循環立扇":{price:3190,inspFee:600},
+    "Beutii 蒸氣烤箱 Master Pro":{price:4085,inspFee:1100}
+  },
   app:[
     /* ══ 通用外觀 ══ */
     {item:"通用",p:"電源線",d:"外皮破損或割傷",v:"warn",tip:"【人為】安排回倉，立即停止使用"},
@@ -694,6 +707,15 @@ const DEFAULT_DATA={
     {item:"除濕機",p:"出風網罩",d:"破損",v:"warn",tip:"【人為】外力造成，不予換貨"},
     {item:"除濕機",p:"滾輪/底座",d:"斷裂",v:"warn",tip:"【人為】超重或碰撞，不予換貨"},
     {item:"除濕機",p:"控制面板",d:"無反應（首次使用）",v:"warn",tip:"【非人為】DOA，直接換新"},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"扇葉變形/缺損",d:"",v:"amber",tip:"扇葉損傷，確認是否人為；安排回倉換扇葉"},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"防護網變形/破損",d:"",v:"amber",tip:"防護網損傷，安排回倉更換"},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"電源線外觀損傷",d:"",v:"warn",tip:"安全疑慮，立即停止使用，安排回倉"},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"扇葉變形/缺損",d:"",v:"amber",tip:"扇葉損傷，安排回倉換扇葉"},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"底座/立竿裂痕",d:"",v:"amber",tip:"結構損傷，安排回倉"},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"電源線外觀損傷",d:"",v:"warn",tip:"安全疑慮，立即停止使用，安排回倉"},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"烤箱門損壞/鉸鍊鬆脫",d:"",v:"warn",tip:"門部件損壞有燙傷風險，立即停用安排回倉"},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"外殼焦黑/燒焦痕跡",d:"",v:"warn",tip:"安全疑慮，立即停用，安排回倉"},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"水箱漏水/裂痕",d:"",v:"amber",tip:"水箱損壞，停止使用蒸氣功能，安排回倉"},
   ],
   func:[
     /* ══ 通用功能 ══ */
@@ -782,6 +804,101 @@ const DEFAULT_DATA={
     {item:"除濕機",p:"異常噪音或震動",d:"確認底部是否在平坦地面；確認內部有無異物",v:"ok",tip:"【操作問題】確認底座水平，清除異物"},
     {item:"除濕機",p:"排水管漏水",d:"確認排水管連接是否確實；確認排水方向是否正確",v:"ok",tip:"【操作問題】重新連接排水管，確認方向"},
     {item:"除濕機",p:"壓縮機啟動後立即停止",d:"確認環境溫度是否低於適用溫度範圍；靜置 3 分鐘後重試",v:"ok",tip:"【操作問題】確認環境溫度，靜置後重試"},
+    /* Formii 7吋 多步驟 (4-5題) */
+    {item:"Formii 7吋擺頭空氣循環扇",p:"完全不轉動",steps:[
+      {q:"換一個插座（確認插座有電）後重新測試，仍然無法啟動？",yL:"換座仍不動",nL:"換座後可啟動",yes:null,no:{type:"ok",tip:"插座問題，引導消費者確認插座並更換使用"}},
+      {q:"電源線外觀有無損傷（破皮/燒焦/壓折/扭結）？",yL:"有損傷",nL:"外觀正常",yes:{type:"warn",tip:"安全疑慮：立即停止使用，切勿通電，安排灰色回倉"},no:null},
+      {q:"按下開機鍵後，指示燈/顯示燈是否有任何亮起或閃爍？",yL:"有亮起或閃爍",nL:"完全無任何反應",yes:null,no:null},
+      {q:"各風速檔位（低/中/高）逐一撥動，是否有任一檔位有反應？",yL:"某檔位有反應",nL:"全部無反應",yes:{type:"amber",tip:"特定檔位故障，安排回倉（可能為開關面板或控制板問題）"},no:null},
+      {q:"從插座拔下後靜置5分鐘，再重新插上開機，是否有改善？",yL:"靜置後可啟動",nL:"靜置後仍無法啟動",yes:{type:"ok",tip:"暫時性過熱保護啟動，引導消費者冷卻後使用，避免連續長時間運作"},no:{type:"repair",cause:"電機/電源板故障",tip:"完全無法啟動且排除電源問題，需送修檢測電源板或電機"}}
+    ]},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"轉速不穩或轉速異常",steps:[
+      {q:"風扇是否放置在平穩水平的位置（底座是否有傾斜）？",yL:"位置正常",nL:"有傾斜或底座懸空",yes:null,no:{type:"ok",tip:"調整擺放位置，確保底座完全貼地平穩"}},
+      {q:"扇葉或進氣口是否有積塵堵塞（目視檢查）？",yL:"有明顯積塵",nL:"無積塵",yes:{type:"ok",tip:"清潔扇葉及進氣口後重新測試，積塵會導致風阻增加影響轉速"},no:null},
+      {q:"低/中/高三個風速檔位中，是否只有「特定某個」檔位不穩？",yL:"只有某檔不穩",nL:"全部檔位都不穩",yes:{type:"amber",tip:"特定檔位不穩，可能為開關接點問題，安排回倉確認"},no:null},
+      {q:"轉速不穩時是否同時伴隨異音、異味或機體異常發熱？",yL:"有伴隨異音/異味/發熱",nL:"只有轉速問題，無其他異常",yes:{type:"warn",tip:"複合性異常，可能為電機問題，立即停用安排回倉"},no:{type:"repair",cause:"DC馬達或控制板異常",tip:"轉速不穩但無其他症狀，仍需送修確認DC控制板"}}
+    ]},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"擺頭功能失效",steps:[
+      {q:"是否確認按下「擺頭按鍵」（有無看到燈號變化或聽到啟動聲）？",yL:"有確認按下且有反應",nL:"按下但完全無反應",yes:null,no:{type:"ok",tip:"引導消費者重新操作：按鍵長按2秒或連按兩次，參考說明書操作步驟"}},
+      {q:"轉軸、擺頭連桿周圍是否有異物或纏繞物卡住？",yL:"有異物卡住",nL:"周圍無異物",yes:{type:"ok",tip:"清除異物後重新測試，纏繞物或異物是常見的擺頭失效原因"},no:null},
+      {q:"風扇運轉時，擺頭機構是否有嘗試轉動但中途卡住（有聲音但不動）？",yL:"有聲音但轉不動",nL:"完全無任何動靜",yes:null,no:{type:"amber",tip:"擺頭機構完全無反應，安排回倉確認（可能為控制板信號問題）"}},
+      {q:"拔下電源靜置2分鐘後重新啟動，擺頭功能是否恢復？",yL:"重開後可擺頭",nL:"重開後仍失效",yes:{type:"ok",tip:"暫時性軟體問題，引導消費者定期斷電重置，若持續發生需安排回倉"},no:{type:"repair",cause:"擺頭齒輪/驅動電機故障",tip:"機構有動作嘗試但卡住，齒輪或電機損壞，需送修"}}
+    ]},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"運轉時發出異音",steps:[
+      {q:"扇葉是否有碰觸到防護網，或扇葉/網罩內有異物（頭髮/碎屑）？",yL:"有碰觸或異物",nL:"無碰觸/異物",yes:{type:"ok",tip:"清除異物、調整扇葉固定螺絲、重新固定防護網即可解決"},no:null},
+      {q:"異音是否只在特定擺頭角度（左轉底/右轉底）才出現？",yL:"特定角度才出現",nL:"不限角度，持續出現",yes:{type:"amber",tip:"擺頭連桿特定角度干涉，安排回倉調整或更換擺頭連桿"},no:null},
+      {q:"異音是否為「規律的金屬摩擦聲」或「喀喀碰撞聲」？",yL:"是金屬/碰撞聲",nL:"是嗡嗡振動聲",yes:null,no:{type:"amber",tip:"振動共鳴聲，可能為底座未平穩或扇葉輕微變形，安排回倉確認"}},
+      {q:"運轉時是否有電氣焦味、冒煙或機體異常發熱？",yL:"有焦味/冒煙/發熱",nL:"無以上情況",yes:{type:"warn",tip:"安全疑慮：立即停止使用斷電，安排回倉（可能為電機異常或線路問題）"},no:{type:"repair",cause:"軸承磨損或機械共振",tip:"金屬摩擦聲來源需拆機確認，可能為軸承磨損，需送修"}}
+    ]},
+    {item:"Formii 7吋擺頭空氣循環扇",p:"遙控器或定時功能失效",steps:[
+      {q:"遙控器是否已更換過「全新電池」進行測試？",yL:"換過新電池",nL:"未換電池",yes:null,no:{type:"ok",tip:"請先更換遙控器電池（建議用碳鋅電池）後再測試"}},
+      {q:"站在1公尺以內，直接對準機器「感應窗」正面操作，是否有反應？",yL:"近距離有反應",nL:"近距離仍無反應",yes:{type:"ok",tip:"距離過遠或角度偏斜，引導消費者近距離對準感應窗正面使用"},no:null},
+      {q:"不使用遙控器，改用機器「面板上的定時按鍵」，是否有反應？",yL:"面板定時正常",nL:"面板定時也無反應",yes:null,no:{type:"repair",cause:"主控板定時模組故障",tip:"面板按鍵也無效，主控板定時功能異常，需送修"}},
+      {q:"嘗試斷電靜置30秒重新啟動，遙控功能是否恢復？",yL:"重開後恢復",nL:"重開後仍無效",yes:{type:"ok",tip:"暫時性電子干擾，引導消費者定期斷電重置。若持續發生再安排送修"},no:{type:"repair",cause:"遙控接收模組故障",tip:"面板正常但遙控完全無效，遙控接收模組可能損壞，需送修更換"}}
+    ]},
+    /* Formii 12吋 多步驟 (4-5題) */
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"完全不轉動",steps:[
+      {q:"換一個插座（確認插座有電）後重新測試，仍然無法啟動？",yL:"換座仍不動",nL:"換座後可啟動",yes:null,no:{type:"ok",tip:"插座問題，引導消費者確認插座後換用其他插座"}},
+      {q:"按下開機鍵後，電源指示燈是否有任何亮起或閃爍？",yL:"燈有亮/閃",nL:"完全無任何反應",yes:null,no:null},
+      {q:"電源線外觀有無損傷（破皮/燒焦/壓折）？",yL:"有損傷",nL:"外觀正常",yes:{type:"warn",tip:"安全疑慮：立即停止使用，安排灰色回倉，切勿通電"},no:null},
+      {q:"各DC風速段（1~12段）逐一按鈕測試，是否有任一段有反應？",yL:"某段有反應",nL:"全部無反應",yes:{type:"amber",tip:"部分段位失效，可能為面板控制板問題，安排回倉確認"},no:null},
+      {q:"拔下電源靜置5分鐘後重新啟動，是否有改善？",yL:"靜置後可啟動",nL:"靜置後仍無法啟動",yes:{type:"ok",tip:"過熱保護啟動，引導消費者避免連續長時間使用，加強散熱環境"},no:{type:"repair",cause:"主控板/DC變頻板故障",tip:"排除電源問題後仍無法啟動，需送修DC變頻板或主控板"}}
+    ]},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"轉速不穩或風力不足",steps:[
+      {q:"扇葉及進氣口是否有明顯積塵堵塞？",yL:"有積塵",nL:"無積塵",yes:{type:"ok",tip:"清潔扇葉及進氣口後重新測試，積塵嚴重影響DC風扇效率"},no:null},
+      {q:"各DC風速段（1~12段）逐一測試，段差是否明顯（能感覺到每段風量差異）？",yL:"段差明顯正常",nL:"段差極不明顯或無法區分",yes:null,no:{type:"repair",cause:"DC變頻模組異常",tip:"DC控制板無法正確輸出各段電壓，需送修更換DC變頻模組"}},
+      {q:"只有在「低速段（1~4段）」時才出現風力不足，高速段正常？",yL:"只有低速不足",nL:"各速都不足",yes:{type:"amber",tip:"低速段異常，可能為DC控制板低速區域問題，安排回倉確認"},no:null},
+      {q:"不穩定的情況是否在持續使用30分鐘後才出現（熱機後異常）？",yL:"熱機後才出現",nL:"一開始就不穩",yes:{type:"amber",tip:"熱機後才異常，可能為DC板過熱保護問題，安排回倉確認散熱設計"},no:{type:"repair",cause:"DC馬達或控制板效能異常",tip:"冷機即不穩，DC馬達效能下降，需送修確認"}}
+    ]},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"定時或睡眠功能失效",steps:[
+      {q:"遙控器電池是否已換過全新電池（非舊電池）？",yL:"換過新電池",nL:"未換電池",yes:null,no:{type:"ok",tip:"先更換遙控器全新電池再測試（建議用碳鋅電池）"}},
+      {q:"近距離（1公尺內）直接對準感應窗，用遙控器按定時鍵，是否有反應？",yL:"近距離有反應",nL:"近距離仍無反應",yes:{type:"ok",tip:"遙控器使用距離或角度問題，引導消費者近距離正面操作"},no:null},
+      {q:"改用機器面板上的定時按鍵直接操作，是否有反應（燈號或聲音）？",yL:"面板有反應",nL:"面板也完全無反應",yes:null,no:{type:"repair",cause:"主控板定時模組故障",tip:"面板定時也無效，主控板定時功能異常，需送修"}},
+      {q:"嘗試斷電靜置30秒進行全功能復位，定時功能是否恢復？",yL:"復位後仍無效",nL:"未做復位",yes:{type:"repair",cause:"主控板定時功能故障",tip:"復位後仍無效，定時模組損壞，需送修主控板"},no:{type:"ok",tip:"引導消費者進行全功能復位（斷電30秒）。若復位後恢復即為暫時性問題，若持續再安排送修"}}
+    ]},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"運轉時發出異音",steps:[
+      {q:"扇葉是否有碰觸到防護網，或有異物（頭髮/碎屑）卡在扇葉間？",yL:"有碰觸或異物",nL:"無碰觸/異物",yes:{type:"ok",tip:"清除異物、調整扇葉固定、重新固定防護網螺絲"},no:null},
+      {q:"異音是否只在特定擺頭角度（左轉底/右轉底）時才出現？",yL:"特定角度才出現",nL:"不限角度或持續出現",yes:{type:"ok",tip:"擺頭連桿在特定角度有干涉，引導消費者限制擺頭角度；若持續發生安排回倉調整"},no:null},
+      {q:"扇葉高速轉動時，是否明顯聽到「刮網聲」（規律的碰觸聲）？",yL:"有刮網聲",nL:"無刮網聲",yes:{type:"amber",tip:"扇葉可能輕微變形或防護網固定鬆動，安排回倉更換扇葉或重新固定"},no:null},
+      {q:"異音時是否伴隨電氣焦味、冒煙或機體局部過熱？",yL:"有焦味/冒煙/過熱",nL:"無以上情況",yes:{type:"warn",tip:"安全疑慮：立即斷電停用，安排回倉（DC馬達或線路可能異常）"},no:{type:"repair",cause:"軸承磨損或DC馬達機械異音",tip:"金屬摩擦異音需拆機確認，DC馬達軸承磨損，需送修"}}
+    ]},
+    {item:"Formii 12吋全方位DC直流循環立扇",p:"遙控器完全無法控制",steps:[
+      {q:"遙控器是否已更換「全新電池」測試？",yL:"換過新電池",nL:"未換電池",yes:null,no:{type:"ok",tip:"更換全新電池即可解決（建議用碳鋅電池，避免使用快沒電的舊電池）"}},
+      {q:"站在1公尺以內，直接對準機器感應窗「正面」操作，是否仍無反應？",yL:"近距離仍無效",nL:"近距離可以操作",yes:null,no:{type:"ok",tip:"使用距離過遠或角度偏斜，引導消費者正確使用方式（正面1公尺內）"}},
+      {q:"嘗試讓遙控器靠近感應窗5公分內按下，是否有任何反應？",yL:"極近距離也無效",nL:"貼近才有反應",yes:null,no:{type:"amber",tip:"遙控器訊號弱，可能為電池接觸不良或遙控器本身老化，建議更換遙控器"}},
+      {q:"機器本體面板按鍵功能（風速/定時等）是否完全正常？",yL:"面板完全正常",nL:"面板也有部分失效",yes:{type:"repair",cause:"遙控接收模組故障",tip:"本體正常但遙控完全失效，遙控接收模組損壞，需送修或更換遙控接收板"},no:{type:"repair",cause:"主控板故障",tip:"面板功能也異常，主控板可能損壞，需送修"}}
+    ]},
+    /* Beutii 蒸氣烤箱 多步驟 (4-5題) */
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"不加熱或加熱不均",steps:[
+      {q:"電源燈號是否正常亮起，且溫度設定已確認正確（參考說明書）？",yL:"確認正確設定",nL:"未確認",yes:null,no:{type:"ok",tip:"引導消費者確認電源連接及溫度設定步驟（對照說明書圖示操作）"}},
+      {q:"設定溫度後「預熱至少5分鐘」，烤箱內部是否完全無溫度上升（手放在門縫感受）？",yL:"完全無加熱感",nL:"有加熱但分布不均",yes:null,no:{type:"amber",tip:"加熱不均，可能為單側發熱管問題，安排回倉確認發熱管及熱對流設計"}},
+      {q:"確認烤盤是否放在正確位置（避免遮蔽發熱管），移動後加熱是否改善？",yL:"調整後仍完全無熱",nL:"調整後有改善",yes:null,no:{type:"ok",tip:"食材擺放位置問題，引導消費者參考說明書建議擺放方式"}},
+      {q:"斷電後等待2分鐘，重新啟動並設定最高溫度，3分鐘內是否有任何加熱感？",yL:"完全無加熱",nL:"有輕微加熱",yes:{type:"repair",cause:"加熱管或溫控器故障",tip:"發熱元件完全失效，需送修或更換加熱管"},no:{type:"repair",cause:"溫度感測器或溫控板異常",tip:"有輕微加熱但效果差，溫控系統異常，需送修"}}
+    ]},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"蒸氣功能無法噴出",steps:[
+      {q:"水箱是否正確放置且水量充足（液位超過最低水位刻度）？",yL:"正確放置且水量足",nL:"水箱未正確放置或水量不足",yes:null,no:{type:"ok",tip:"引導消費者確認水箱正確安裝位置及最低加水量（對照說明書圖示）"}},
+      {q:"水箱本身及蒸氣出口孔是否有明顯水垢積聚或堵塞物？",yL:"有水垢/堵塞",nL:"外觀正常無堵塞",yes:{type:"ok",tip:"引導消費者進行除水垢清潔：白醋+水1:1比例，浸泡1小時後排空重新使用"},no:null},
+      {q:"啟動蒸氣功能等待「至少3分鐘」，是否完全無任何蒸氣或水霧噴出？",yL:"完全無蒸氣",nL:"有少量蒸氣但不足",yes:null,no:{type:"amber",tip:"蒸氣量不足，可能為加熱元件效能下降或水路部分阻塞，安排回倉確認水泵"}},
+      {q:"拔掉電源靜置10分鐘後重新啟動並測試蒸氣，是否有改善？",yL:"靜置後仍無蒸氣",nL:"未靜置測試",yes:{type:"repair",cause:"蒸氣發生器或水泵故障",tip:"蒸氣發生元件完全失效，需送修更換蒸氣模組"},no:{type:"ok",tip:"引導消費者先執行靜置重置，若蒸氣恢復即暫時性問題；持續異常再安排送修"}}
+    ]},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"溫度無法控制或異常",steps:[
+      {q:"是否出現「持續升溫超過設定值且無法降溫」的現象（溫度失控）？",yL:"有持續過熱失控",nL:"只是溫度不準確",yes:{type:"warn",tip:"嚴重安全疑慮：立即斷電停用，安排回倉。溫控保護失效有引發火災風險，切勿繼續使用"},no:null},
+      {q:"重新設定不同的目標溫度，面板溫度顯示數字是否有對應變化？",yL:"顯示有變化",nL:"顯示完全無反應",yes:null,no:{type:"repair",cause:"溫控板輸入功能故障",tip:"溫度設定完全無效，溫控板輸入端損壞，需送修"}},
+      {q:"實際烤箱內溫度（可用溫度計測量）與面板顯示差異是否超過20°C？",yL:"差異超過20°C",nL:"差異在合理範圍",yes:{type:"amber",tip:"溫度顯示嚴重不準，感測器可能偏移，安排回倉校正溫度感測器"},no:null},
+      {q:"斷電靜置5分鐘後重新啟動設定溫度，顯示及加熱是否恢復正常？",yL:"重開後恢復正常",nL:"重開後仍然異常",yes:{type:"ok",tip:"暫時性系統異常，引導消費者定期斷電重置。若持續發生需安排回倉校正"},no:{type:"repair",cause:"溫控板或溫度感測器故障",tip:"溫控系統持續異常，需送修更換溫控板或感測器"}}
+    ]},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"計時器不動作或不準確",steps:[
+      {q:"計時器按鍵按下後，面板是否有任何顯示變化或反應（燈號/聲音）？",yL:"按下完全無反應",nL:"有反應但計時不準",yes:null,no:null},
+      {q:"計時倒數時，速度是否明顯偏差（1分鐘設定實際卻30秒就結束，或超過2分鐘）？",yL:"誤差非常大",nL:"誤差輕微（5-10秒）",yes:null,no:{type:"ok",tip:"輕微誤差（5-10秒/分鐘）屬電子計時器正常範圍，引導消費者確認操作步驟是否正確"}},
+      {q:"嘗試斷電靜置30秒後重新開機，再次設定計時，是否恢復正常？",yL:"重開後恢復正常",nL:"重開後仍然異常",yes:{type:"ok",tip:"暫時性軟體問題，引導消費者在每次使用前執行斷電重置。若持續再安排送修"},no:null},
+      {q:"計時倒數到0後，烤箱是否自動停止加熱（或發出提醒聲）？",yL:"到0後無任何動作",nL:"到0後正常停止",yes:{type:"repair",cause:"主控板計時結束觸發功能故障",tip:"計時器倒數但無法觸發停機，主控板邏輯異常，需送修"},no:{type:"repair",cause:"計時顯示模組故障",tip:"功能邏輯正常但計時顯示異常，需送修顯示/控制板"}}
+    ]},
+    {item:"Beutii 蒸氣烤箱 Master Pro",p:"門封不良或漏氣漏水",steps:[
+      {q:"烤箱門用力關閉後，是否有明顯感覺到「門扣鎖緊」的手感（有卡扣聲）？",yL:"有卡扣感",nL:"門無法鎖緊或有明顯縫隙",yes:null,no:null},
+      {q:"目視檢查烤箱門四周的矽膠門封條，是否有老化/裂痕/變形/局部脫落？",yL:"有明顯損傷",nL:"門封條外觀正常",yes:{type:"amber",tip:"門封條損壞，屬耗材問題，安排回倉更換門封條（確認是否在保固期內）"},no:null},
+      {q:"加熱及蒸氣運作時，從門縫四周是否有「大量」蒸氣外洩（明顯白霧外噴）？",yL:"大量蒸氣外洩",nL:"只有輕微散逸",yes:{type:"warn",tip:"安全疑慮（燙傷風險）：立即停用，安排回倉檢修門扣機構及密封結構"},no:null},
+      {q:"用紙條測試：關門後將紙條夾在門縫抽拉，紙條是否有阻力？",yL:"紙條無阻力（門封失效）",nL:"紙條有明顯阻力",yes:{type:"amber",tip:"門封條密封性不足，安排回倉更換門封條"},no:{type:"ok",tip:"門封正常，輕微蒸氣散逸屬正常現象（烤箱非密封設計）。引導消費者確認門扣是否完全扣合"}}
+    ]},
   ]
 };
 
@@ -846,14 +963,17 @@ function initSelects(){
 function getItem(){return document.getElementById('item-sel').value;}
 
 function onItemChange(){
-  checked={};
+  checked={};wizardState={};rfState={warranty:null,damage:null,partsCost:0};
   const item=getItem();
   document.getElementById('step2-area').style.display=item?'':'none';
   if(item) renderBoth();
   renderScFlow();
 }
 
+let wizardState={};
+
 function mkItem(row,key){
+  if(row.steps) return mkWizardItem(row,key);
   const on=!!checked[key];
   const sc=on?(row.v==='warn'?'state-warn':row.v==='amber'?'state-amber':'state-ok'):'';
   const ac=row.v==='warn'?'action-warn':row.v==='amber'?'action-amber':'action-ok';
@@ -866,6 +986,91 @@ function mkItem(row,key){
       ${on?`<span class="item-action ${ac}">${al}${row.tip}</span>`:''}
     </div>
   </div>`;
+}
+
+function mkWizardItem(row,key){
+  const ws=wizardState[key]||null;
+  const result=ws?ws.result:null;
+  const rCls={ok:'state-ok',amber:'state-amber',warn:'state-warn',repair:'state-amber'}[result]||'';
+  const rLabel={ok:'✅ 線上排除',amber:'⚠️ 灰色回倉',warn:'🚨 安全疑慮',repair:'🔧 需送修判斷'}[result]||'';
+  const ac={ok:'action-ok',amber:'action-amber',warn:'action-warn',repair:'action-warn'}[result]||'action-amber';
+  let bodyHTML='';
+  if(ws&&ws.open&&!result){
+    const s=ws.step||0;
+    const step=row.steps[s];
+    const total=row.steps.length;
+    let dots='<div style="display:flex;gap:4px;margin-bottom:10px">';
+    for(let i=0;i<total;i++) dots+=`<div style="width:8px;height:8px;border-radius:50%;background:${i<s?'#2ECC71':i===s?'#1C2833':'#D5D8DC'}"></div>`;
+    dots+='</div>';
+    bodyHTML=`<div style="margin-top:10px;padding:12px;background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED">
+      ${dots}
+      <div style="font-size:13px;color:#1C2833;margin-bottom:12px;font-weight:500">❓ ${step.q}</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="answerWizard('${key}',true);event.stopPropagation()" style="flex:1;padding:8px;font-size:12px;font-weight:700;font-family:inherit;background:#EAFAF1;border:1.5px solid #2ECC71;color:#1E8449;border-radius:8px;cursor:pointer">${step.yL||'是'}</button>
+        <button onclick="answerWizard('${key}',false);event.stopPropagation()" style="flex:1;padding:8px;font-size:12px;font-weight:700;font-family:inherit;background:#FEF9E7;border:1.5px solid #F39C12;color:#784212;border-radius:8px;cursor:pointer">${step.nL||'否'}</button>
+      </div>
+    </div>`;
+  } else if(ws&&ws.open&&result){
+    const tipMap={ok:{bg:'#EAFAF1',bc:'#2ECC71',tc:'#1E8449',icon:'✅'},amber:{bg:'#F1EFE8',bc:'#888780',tc:'#444441',icon:'⚠️'},warn:{bg:'#FDEDEC',bc:'#E74C3C',tc:'#C0392B',icon:'🚨'},repair:{bg:'#F3E5F5',bc:'#9b59b6',tc:'#6C3483',icon:'🔧'}};
+    const tm=tipMap[result]||tipMap.amber;
+    bodyHTML=`<div style="margin-top:10px;padding:12px;background:${tm.bg};border:1.5px solid ${tm.bc};border-radius:8px">
+      <div style="font-weight:700;color:${tm.tc};margin-bottom:6px">${tm.icon} ${rLabel}</div>
+      <div style="font-size:12px;color:#5D6D7E;line-height:1.6">${ws.tip||''}</div>
+      ${ws.cause?`<div style="font-size:12px;color:${tm.tc};margin-top:4px;font-weight:600">故障推斷：${ws.cause}</div>`:''}
+    </div>
+    <button onclick="resetWizard('${key}');event.stopPropagation()" style="background:none;border:none;color:#95A5A6;font-size:11px;cursor:pointer;margin-top:6px;text-decoration:underline;font-family:inherit">↩ 重新判斷</button>`;
+  }
+  return `<div class="check-item ${rCls}" onclick="toggleWizard('${key}')" style="flex-direction:column;align-items:stretch;cursor:pointer">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="cb-box">${result?'<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3L10 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
+      <div class="item-content">
+        <div class="item-title">${row.p}</div>
+        <div class="item-desc" style="font-size:11px;color:#7F8C8D">${result?rLabel:'點選展開逐步判斷'}</div>
+        ${result?`<span class="item-action ${ac}">${rLabel}</span>`:''}
+      </div>
+      <span style="color:#95A5A6;font-size:12px">${ws&&ws.open?'▲':'▼'}</span>
+    </div>
+    ${bodyHTML}
+  </div>`;
+}
+
+function toggleWizard(key){
+  if(!wizardState[key]) wizardState[key]={open:false,step:0,result:null,tip:null,cause:null};
+  wizardState[key].open=!wizardState[key].open;
+  renderBoth();
+}
+
+function answerWizard(key,answer){
+  const item=getItem();
+  const allFunc=DB.func.filter(r=>r.item==='通用'||r.item===item);
+  const prefix='func_'+item+'_';
+  let row=null;
+  if(key.startsWith(prefix)){
+    const rest=key.slice(prefix.length);
+    if(rest.startsWith('c')){
+      const common=allFunc.filter(r=>r.item==='通用');
+      row=common[parseInt(rest.slice(1))];
+    } else if(rest.startsWith('s')){
+      const spec=allFunc.filter(r=>r.item===item);
+      row=spec[parseInt(rest.slice(1))];
+    }
+  }
+  if(!row||!row.steps) return;
+  const ws=wizardState[key];
+  const step=row.steps[ws.step];
+  const outcome=answer?step.yes:step.no;
+  if(outcome===null){
+    ws.step++;
+    if(ws.step>=row.steps.length){ws.result='amber';ws.tip='無法確認，請安排回倉確認';}
+  } else {
+    ws.result=outcome.type;ws.tip=outcome.tip||'';ws.cause=outcome.cause||null;
+  }
+  renderBoth();renderRepairPanel();
+}
+
+function resetWizard(key){
+  wizardState[key]={open:true,step:0,result:null,tip:null,cause:null};
+  renderBoth();renderRepairPanel();
 }
 
 function renderCol(type,containerId,countId){
@@ -888,6 +1093,7 @@ function renderBoth(){
   renderCol('app','app-list','app-count');
   renderCol('func','func-list','func-count');
   renderSummary();
+  renderRepairPanel();
 }
 
 function toggle(key){ checked[key]=!checked[key]; renderBoth(); }
@@ -935,7 +1141,116 @@ function renderSummary(){
   </div>`;
 }
 
-function resetChecked(){ checked={}; renderBoth(); }
+function resetChecked(){ checked={}; wizardState={}; rfState={warranty:null,damage:null,partsCost:0}; renderBoth(); }
+
+/* ══ REPAIR PANEL ══ */
+let rfState={warranty:null,damage:null,partsCost:0};
+
+function getRepairItems(){
+  const item=getItem(); if(!item) return [];
+  const allFunc=DB.func.filter(r=>r.item==='通用'||r.item===item);
+  const prefix='func_'+item+'_';
+  const common=allFunc.filter(r=>r.item==='通用');
+  const spec=allFunc.filter(r=>r.item===item);
+  const repairs=[];
+  common.forEach((row,i)=>{
+    if(!row.steps) return;
+    const k=prefix+'c'+i;
+    const ws=wizardState[k];
+    if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip});
+  });
+  spec.forEach((row,i)=>{
+    if(!row.steps) return;
+    const k=prefix+'s'+i;
+    const ws=wizardState[k];
+    if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip});
+  });
+  return repairs;
+}
+
+function renderRepairPanel(){
+  const area=document.getElementById('sc-flow-area');
+  const item=getItem();
+  const repairs=getRepairItems();
+  if(!repairs.length){area.innerHTML='';renderScFlow();return;}
+  const pd=(DB.prices&&DB.prices[item])||{price:0,inspFee:600};
+  const itemsHTML=repairs.map(r=>`<div style="padding:6px 0;border-bottom:1px solid #F0F2F5;font-size:12px"><strong>${r.symptom}</strong>　${r.cause?'— '+r.cause:''}</div>`).join('');
+  const wBtns=[['doa','DOA（到貨即壞）'],['rma','RMA 保固內'],['expired','過保']].map(([v,l])=>
+    `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.warranty===v?'#1C2833':'#D5D8DC'};background:${rfState.warranty===v?'#1C2833':'#fff'};color:${rfState.warranty===v?'#fff':'#1C2833'}" onclick="setRF('warranty','${v}')">${l}</button>`
+  ).join('');
+  const dBtns=[['nonhuman','非人為損傷'],['human','人為損傷']].map(([v,l])=>
+    `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.damage===v?'#1C2833':'#D5D8DC'};background:${rfState.damage===v?'#1C2833':'#fff'};color:${rfState.damage===v?'#fff':'#1C2833'}" onclick="setRF('damage','${v}')">${l}</button>`
+  ).join('');
+  area.innerHTML=`<div class="sc-flow show">
+    <div class="sc-flow-head"><div class="step-num" style="background:#C0392B">4</div><div class="sc-flow-title">送修判斷流程 — STEP 4-6</div></div>
+    <div class="sc-flow-body">
+      <div style="background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;padding:12px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#95A5A6;margin-bottom:8px">📋 需送修症狀清單</div>
+        ${itemsHTML}
+        ${pd.price?`<div style="margin-top:8px;font-size:11px;color:#7F8C8D">商品售價：NT$${pd.price.toLocaleString()} ／ 全虹檢測費：NT$${pd.inspFee}</div>`:''}
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:8px">STEP 4 ／ 保固狀態判斷</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${wBtns}</div>
+      </div>
+      <div style="margin-bottom:14px;${rfState.warranty?'':'opacity:.4;pointer-events:none'}">
+        <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:8px">STEP 5 ／ 損傷類型判斷</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${dBtns}</div>
+      </div>
+      <div style="${rfState.damage?'':'opacity:.4;pointer-events:none'}">
+        <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:8px">STEP 6 ／ 成本比對與最終建議</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <span style="font-size:12px;color:#5D6D7E">備品零件費用 NT$</span>
+          <input type="number" min="0" placeholder="0" value="${rfState.partsCost||''}"
+            style="width:110px;padding:6px 10px;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;font-family:inherit;color:#1C2833"
+            oninput="rfState.partsCost=parseInt(this.value)||0;updateVerdict(${pd.price||0},${pd.inspFee||600})">
+          <span style="font-size:11px;color:#95A5A6">（全虹估價後填入）</span>
+        </div>
+        <div id="repair-verdict"></div>
+      </div>
+    </div>
+  </div>`;
+  if(rfState.warranty&&rfState.damage) updateVerdict(pd.price||0,pd.inspFee||600);
+}
+
+function setRF(k,v){rfState[k]=v;renderRepairPanel();}
+
+function updateVerdict(price,inspFee){
+  const vd=document.getElementById('repair-verdict');if(!vd)return;
+  const parts=rfState.partsCost||0;
+  const total=inspFee+parts;
+  const pct=price>0?Math.round(total/price*100):0;
+  const w=rfState.warranty,d=rfState.damage;
+  if(!w||!d){vd.innerHTML='';return;}
+  let verdict='',details='',bg='',bc='';
+  if(w==='doa'){
+    verdict='🔄 DOA — 換機處理';bg='#EAFAF1';bc='#2ECC71';
+    details=`保固期內（DOA），屬製造問題 → 安排換良品或退款。<br>${d==='human'?'⚠️ 注意：若確認為人為損傷，需另行處理。':'非人為確認，直接安排換機。'}`;
+  } else if(w==='rma'){
+    if(d==='human'){
+      verdict='💰 RMA保固內但人為損傷 — 照價收費';bg='#FEF9E7';bc='#F39C12';
+      details=`保固內人為損傷不在保固範圍。<br>維修費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%${pct>40?'<br>⚠️ 超過售價40%，建議消費者考慮購買新品。':''}`:''}<br>告知消費者費用後由消費者決定是否維修。<br>⚠️ 若消費者不同意維修費用 → 安排寄回，運費雙方各付一半。`;
+    } else {
+      verdict='✅ RMA 保固維修 — 免費';bg='#EAFAF1';bc='#2ECC71';
+      details=`保固期內非人為損傷，由全虹安排維修，費用由廠商吸收。<br>維修完成後回寄消費者，並記錄維修結果。`;
+    }
+  } else {
+    if(price>0&&pct>40&&d!=='human'){
+      verdict='🛒 建議購買新品';bg='#F3E5F5';bc='#9b59b6';
+      details=`過保非人為損傷，維修費用NT$${total.toLocaleString()}佔售價${pct}%（超過40%門檻）。<br>➡️ 維修不划算，建議消費者購買新品，可提供折扣優惠碼（請示主管）。`;
+    } else if(d==='human'){
+      verdict='💰 過保 + 人為損傷 — 全額收費';bg='#FDEDEC';bc='#E74C3C';
+      details=`過保且人為損傷，消費者需全額負擔費用。<br>費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%${pct>40?'<br>⚠️ 維修費超過售價40%，建議考慮購買新品。':''}`:''}<br>告知消費者費用後由消費者決定。`;
+    } else {
+      verdict='🔧 過保維修 — 收費';bg='#EBF5FB';bc='#AED6F1';
+      details=`過保非人為損傷，由全虹收費維修。<br>費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%（${pct<=30?'未超過30%，維修合理':'建議確認是否換新品'}）`:''}`;
+    }
+  }
+  vd.innerHTML=`<div style="background:${bg};border:1.5px solid ${bc};border-radius:9px;padding:13px 15px">
+    <div style="font-weight:700;font-size:13px;margin-bottom:6px">${verdict}</div>
+    <div style="font-size:12px;line-height:1.8;color:#1C2833">${details}</div>
+  </div>`;
+}
 
 /* ══════════════════════════════════════════════════
    ADMIN MODE
@@ -981,14 +1296,46 @@ function toggleAdmin(){
 
 function switchAdminTab(t){
   adminTab=t;
-  ['item','app','func','sc'].forEach(x=>{
-    document.getElementById('atab-'+x).className='admin-tab'+(x===t?' on':'');
-    document.getElementById('admin-tab-'+x).style.display=x===t?'block':'none';
+  ['item','price','app','func','sc'].forEach(x=>{
+    const el=document.getElementById('atab-'+x);
+    const panel=document.getElementById('admin-tab-'+x);
+    if(el) el.className='admin-tab'+(x===t?' on':'');
+    if(panel) panel.style.display=x===t?'block':'none';
   });
   if(t==='app') renderAdminAppList();
   if(t==='func') renderAdminFuncList();
   if(t==='item') renderItemManageList();
   if(t==='sc'){renderScAdminPanel();}
+  if(t==='price') renderPriceAdmin();
+}
+
+function renderPriceAdmin(){
+  const el=document.getElementById('price-list');if(!el)return;
+  if(!DB.prices) DB.prices={};
+  let html='<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html+='<thead><tr style="background:#F0F3F4"><th style="padding:8px 12px;text-align:left;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">商品名稱</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">售價 (NT$)</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">全虹檢測費 (NT$)</th><th style="padding:8px 12px;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">操作</th></tr></thead><tbody>';
+  DB.items.forEach(name=>{
+    const pd=DB.prices[name]||{price:'',inspFee:600};
+    const enc=encodeURIComponent(name);
+    html+=`<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5;font-weight:700">${name}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5"><input type="number" id="p_${enc}" value="${pd.price}" placeholder="尚未設定" style="width:100px;padding:5px 8px;font-size:12px;border:1px solid #D5D8DC;border-radius:6px;font-family:inherit"></td>
+      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5"><input type="number" id="f_${enc}" value="${pd.inspFee||600}" placeholder="600" style="width:100px;padding:5px 8px;font-size:12px;border:1px solid #D5D8DC;border-radius:6px;font-family:inherit"></td>
+      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5"><button onclick="savePrice('${enc}')" style="padding:5px 12px;font-size:12px;font-weight:700;font-family:inherit;background:#1C2833;color:#fff;border:none;border-radius:6px;cursor:pointer">儲存</button></td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+function savePrice(enc){
+  if(!DB.prices) DB.prices={};
+  const name=decodeURIComponent(enc);
+  const pe=document.getElementById('p_'+enc);
+  const fe=document.getElementById('f_'+enc);
+  if(!pe) return;
+  DB.prices[name]={price:parseInt(pe.value)||0,inspFee:parseInt(fe.value)||600};
+  saveData();showNotice('save-notice-price');
 }
 
 function selVerdict(type,v,btn){
