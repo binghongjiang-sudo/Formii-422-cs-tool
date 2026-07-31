@@ -1217,9 +1217,12 @@ function renderRepairPanel(){
   const wBtns=[['doa','DOA（到貨即壞）'],['rma','RMA 保固內'],['expired','過保']].map(([v,l])=>
     `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.warranty===v?'#1C2833':'#D5D8DC'};background:${rfState.warranty===v?'#1C2833':'#fff'};color:${rfState.warranty===v?'#fff':'#1C2833'}" onclick="setRF('warranty','${v}')">${l}</button>`
   ).join('');
-  const dBtns=[['nonhuman','非人為損傷'],['human','人為損傷']].map(([v,l])=>
-    `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.damage===v?'#1C2833':'#D5D8DC'};background:${rfState.damage===v?'#1C2833':'#fff'};color:${rfState.damage===v?'#fff':'#1C2833'}" onclick="setRF('damage','${v}')">${l}</button>`
-  ).join('');
+  const isDOA=rfState.warranty==='doa';
+  const dBtns=isDOA
+    ?`<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:default;border:1.5px solid #1C2833;background:#1C2833;color:#fff">非人為損傷</button><button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:default;border:1.5px solid #E8EAED;background:#F8F9FA;color:#BDC3C7" disabled>人為損傷</button><span style="font-size:10px;color:#95A5A6;align-self:center">🔒 DOA 自動判定</span>`
+    :[['nonhuman','非人為損傷'],['human','人為損傷']].map(([v,l])=>
+      `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.damage===v?'#1C2833':'#D5D8DC'};background:${rfState.damage===v?'#1C2833':'#fff'};color:${rfState.damage===v?'#fff':'#1C2833'}" onclick="setRF('damage','${v}')">${l}</button>`
+    ).join('');
   area.innerHTML=`<div class="sc-flow show">
     <div class="sc-flow-head"><div class="step-num" style="background:#C0392B">4</div><div class="sc-flow-title">送修判斷流程 — STEP 4-6</div></div>
     <div class="sc-flow-body">
@@ -1277,7 +1280,7 @@ function renderRepairPanel(){
   if(rfState.warranty&&rfState.damage) updateVerdict(pd.price||0,pd.inspFee||600);
 }
 
-function setRF(k,v){rfState[k]=v;if(k==='warranty'){rfState.damage=null;rfState.partsCost=0;}renderRepairPanel();}
+function setRF(k,v){rfState[k]=v;if(k==='warranty'){rfState.damage=v==='doa'?'nonhuman':null;rfState.partsCost=0;}renderRepairPanel();}
 
 function suggestPartIdxs(repairs,parts){
   if(!repairs.length||!parts.length) return new Set();
