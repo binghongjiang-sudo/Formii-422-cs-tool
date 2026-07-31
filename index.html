@@ -612,7 +612,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=12;
+const DATA_VERSION=13;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -1074,6 +1074,7 @@ function mkWizardItem(row,key){
     let dots='<div style="display:flex;gap:4px;margin-bottom:10px">';
     for(let i=0;i<total;i++) dots+=`<div style="width:8px;height:8px;border-radius:50%;background:${i<s?'#2ECC71':i===s?'#1C2833':'#D5D8DC'}"></div>`;
     dots+='</div>';
+    const backBtnQ=s>0?`<button onclick="backWizard('${key}');event.stopPropagation()" style="background:none;border:1px solid #D5D8DC;color:#7F8C8D;font-size:11px;font-family:inherit;padding:4px 10px;border-radius:6px;cursor:pointer;margin-top:8px">◀ 上一步</button>`:'';
     bodyHTML=`<div style="margin-top:10px;padding:12px;background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED">
       ${dots}
       <div style="font-size:13px;color:#1C2833;margin-bottom:12px;font-weight:500">❓ ${step.q}</div>
@@ -1081,6 +1082,7 @@ function mkWizardItem(row,key){
         <button onclick="answerWizard('${key}',true);event.stopPropagation()" style="flex:1;padding:8px;font-size:12px;font-weight:700;font-family:inherit;background:#EAFAF1;border:1.5px solid #2ECC71;color:#1E8449;border-radius:8px;cursor:pointer">${step.yL||'是'}</button>
         <button onclick="answerWizard('${key}',false);event.stopPropagation()" style="flex:1;padding:8px;font-size:12px;font-weight:700;font-family:inherit;background:#FEF9E7;border:1.5px solid #F39C12;color:#784212;border-radius:8px;cursor:pointer">${step.nL||'否'}</button>
       </div>
+      ${backBtnQ}
     </div>`;
   } else if(ws&&ws.open&&result){
     const tipMap={ok:{bg:'#EAFAF1',bc:'#2ECC71',tc:'#1E8449',icon:'✅'},amber:{bg:'#F1EFE8',bc:'#888780',tc:'#444441',icon:'⚠️'},warn:{bg:'#FDEDEC',bc:'#E74C3C',tc:'#C0392B',icon:'🚨'},repair:{bg:'#F3E5F5',bc:'#9b59b6',tc:'#6C3483',icon:'🔧'}};
@@ -1090,7 +1092,10 @@ function mkWizardItem(row,key){
       <div style="font-size:12px;color:#5D6D7E;line-height:1.6">${ws.tip||''}</div>
       ${ws.cause?`<div style="font-size:12px;color:${tm.tc};margin-top:4px;font-weight:600">故障推斷：${ws.cause}</div>`:''}
     </div>
-    <button onclick="resetWizard('${key}');event.stopPropagation()" style="background:none;border:none;color:#95A5A6;font-size:11px;cursor:pointer;margin-top:6px;text-decoration:underline;font-family:inherit">↩ 重新判斷</button>`;
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button onclick="backWizard('${key}');event.stopPropagation()" style="background:none;border:1px solid #D5D8DC;color:#7F8C8D;font-size:11px;font-family:inherit;padding:4px 10px;border-radius:6px;cursor:pointer">◀ 上一步</button>
+      <button onclick="resetWizard('${key}');event.stopPropagation()" style="background:none;border:none;color:#95A5A6;font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit">↩ 重新判斷</button>
+    </div>`;
   }
   return `<div class="check-item ${rCls}" onclick="toggleWizard('${key}')" style="flex-direction:column;align-items:stretch;cursor:pointer">
     <div style="display:flex;align-items:center;gap:10px">
@@ -1137,6 +1142,13 @@ function answerWizard(key,answer){
   } else {
     ws.result=outcome.type;ws.tip=outcome.tip||'';ws.cause=outcome.cause||null;
   }
+  renderBoth();renderRepairPanel();
+}
+
+function backWizard(key){
+  const ws=wizardState[key]; if(!ws) return;
+  if(ws.result){ws.result=null;ws.tip=null;ws.cause=null;}
+  else if(ws.step>0){ws.step--;}
   renderBoth();renderRepairPanel();
 }
 
