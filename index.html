@@ -60,7 +60,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .sec-label:first-child{margin-top:0}
 .sec-label-excl{font-size:11px;font-weight:700;color:#fff;background:#2471A3;letter-spacing:.04em;margin:10px 0 0;display:block;padding:5px 10px;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:6px}
 .sec-label-excl .excl-badge{font-size:9px;background:rgba(255,255,255,0.25);border-radius:3px;padding:1px 5px;font-weight:700}
-.excl-section .check-item{border-left:3px solid #2980B9;background:#EBF5FB}
+.excl-section .check-item{border-left:3px solid #2980B9;background:#fff}
 .excl-section .check-item.state-ok{background:#D5EFD4;border-left-color:#27AE60}
 .excl-section .check-item.state-warn{background:#FDEDEC;border-left-color:#E74C3C}
 .excl-section .check-item.state-amber{background:#F1EFE8;border-left-color:#888780}
@@ -612,7 +612,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=8;
+const DATA_VERSION=9;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -998,8 +998,8 @@ let verdictSel={app:null,func:null};
 ══════════════════════════════════════════════════ */
 function getBrand(name){
   const n=(name||'').toLowerCase();
-  if(n.startsWith('formii')) return 'Formii';
-  if(/^(422|beutii)/.test(n)) return '422 / Beutii';
+  if(n.startsWith('formii')) return 'formii';
+  if(/^(422|beutii)/.test(n)) return '422';
   return '通用品類';
 }
 
@@ -1007,7 +1007,7 @@ function initSelects(){
   // CS item select (grouped by brand)
   const sel=document.getElementById('item-sel');
   sel.innerHTML='<option value="">— 請選擇消費者回報的品項 —</option>';
-  const brandOrder=['Formii','422 / Beutii','通用品類'];
+  const brandOrder=['formii','422','通用品類'];
   const grouped={};
   DB.items.forEach(it=>{ const b=getBrand(it); if(!grouped[b])grouped[b]=[]; grouped[b].push(it); });
   brandOrder.forEach(brand=>{ if(!grouped[brand]||!grouped[brand].length) return; const og=document.createElement('optgroup'); og.label=brand; grouped[brand].forEach(it=>{ const o=document.createElement('option'); o.textContent=it; og.appendChild(o); }); sel.appendChild(og); });
@@ -1532,7 +1532,7 @@ function delItem(name){
 function renderItemManageList(){
   const el=document.getElementById('item-manage-list');
   if(!DB.items.length){ el.innerHTML='<div class="empty-state">尚無品項</div>'; return; }
-  const brandOrder=['Formii','422 / Beutii','通用品類'];
+  const brandOrder=['formii','422','通用品類'];
   const grouped={};
   DB.items.forEach(name=>{ const b=getBrand(name); if(!grouped[b])grouped[b]=[]; grouped[b].push(name); });
   let html='';
