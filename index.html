@@ -603,13 +603,24 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=3;
+const DATA_VERSION=4;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
-    "Formii 7吋擺頭空氣循環扇":{price:890,inspFee:600},
-    "Formii 12吋全方位DC直流循環立扇":{price:3190,inspFee:600},
-    "Beutii 蒸氣烤箱 Master Pro":{price:4085,inspFee:1100}
+    "Formii 7吋擺頭空氣循環扇":{brand:"Formii",model:"",price:890,tradeInPrice:579,inspFee:600,parts:[]},
+    "Formii 12吋全方位DC直流循環立扇":{brand:"Formii",model:"S02",price:3190,tradeInPrice:2074,inspFee:900,parts:[
+      {name:"要控",price:1550},{name:"馬達",price:1800}
+    ]},
+    "Beutii 蒸氣烤箱 Master Pro":{brand:"422",model:"SA15L",price:8990,tradeInPrice:5844,inspFee:1100,parts:[
+      {name:"要控系統(按鍵主機板)",price:2300},
+      {name:"風道/旋轉系統",price:1800},
+      {name:"加熱系統",price:600},
+      {name:"水路系統",price:300},
+      {name:"外殼1",price:2900},
+      {name:"外殼2(拉門)",price:800},
+      {name:"電源線",price:100},
+      {name:"照明系統",price:300}
+    ]}
   },
   app:[
     /* ══ 通用外觀 ══ */
@@ -1340,30 +1351,66 @@ function switchAdminTab(t){
 function renderPriceAdmin(){
   const el=document.getElementById('price-list');if(!el)return;
   if(!DB.prices) DB.prices={};
-  let html='<table style="width:100%;border-collapse:collapse;font-size:13px">';
-  html+='<thead><tr style="background:#F0F3F4"><th style="padding:8px 12px;text-align:left;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">商品名稱</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">售價 (NT$)</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">全虹檢測費 (NT$)</th><th style="padding:8px 12px;border-bottom:1px solid #E8EAED;font-size:11px;color:#5D6D7E">操作</th></tr></thead><tbody>';
+  let html='';
   DB.items.forEach(name=>{
-    const pd=DB.prices[name]||{price:'',inspFee:600};
+    const pd=DB.prices[name]||{brand:'',model:'',price:'',tradeInPrice:'',inspFee:600,parts:[]};
     const enc=encodeURIComponent(name);
-    html+=`<tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5;font-weight:700">${name}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5"><input type="number" id="p_${enc}" value="${pd.price}" placeholder="尚未設定" style="width:100px;padding:5px 8px;font-size:12px;border:1px solid #D5D8DC;border-radius:6px;font-family:inherit"></td>
-      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5"><input type="number" id="f_${enc}" value="${pd.inspFee||600}" placeholder="600" style="width:100px;padding:5px 8px;font-size:12px;border:1px solid #D5D8DC;border-radius:6px;font-family:inherit"></td>
-      <td style="padding:8px 12px;border-bottom:1px solid #F0F2F5"><button onclick="savePrice('${enc}')" style="padding:5px 12px;font-size:12px;font-weight:700;font-family:inherit;background:#1C2833;color:#fff;border:none;border-radius:6px;cursor:pointer">儲存</button></td>
-    </tr>`;
+    const partsText=(pd.parts||[]).map(p=>p.name+':'+p.price).join('\n');
+    const inp=(id,val,ph,type='text',extra='')=>`<input type="${type}" id="${id}" value="${val||''}" placeholder="${ph}" oninput="${type==='number'&&id.startsWith('p_')?`updateTradeCalc('${enc}')`:''}" style="width:100%;padding:6px 8px;font-size:12px;border:1px solid #D5D8DC;border-radius:6px;font-family:inherit;box-sizing:border-box${extra}">`;
+    html+=`<div style="background:#fff;border:1px solid #E8EAED;border-radius:10px;padding:16px;margin-bottom:14px">
+      <div style="font-weight:700;font-size:13px;color:#1C2833;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #F0F2F5">${name}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
+        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">品牌</div>${inp('br_'+enc,pd.brand,'品牌')}</div>
+        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">商品型號</div>${inp('md_'+enc,pd.model,'型號')}</div>
+        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">促價 (NT$)</div>${inp('p_'+enc,pd.price,'0','number')}</div>
+        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">換購價 65% (NT$)</div>${inp('ti_'+enc,pd.tradeInPrice||'','自動計算','number',';background:#F8F9FA')}</div>
+        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">全虹檢測費 (NT$)</div>${inp('f_'+enc,pd.inspFee||600,'600','number')}</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">零件費細目（每行一筆，格式：名稱:金額）</div>
+        <textarea id="pt_${enc}" rows="5" placeholder="例：馬達:1800&#10;控制板:1500" style="width:100%;padding:6px 8px;font-size:12px;border:1px solid #D5D8DC;border-radius:6px;font-family:inherit;box-sizing:border-box;resize:vertical">${partsText}</textarea>
+      </div>
+      <button onclick="savePrice('${enc}')" style="padding:6px 16px;font-size:12px;font-weight:700;font-family:inherit;background:#1C2833;color:#fff;border:none;border-radius:6px;cursor:pointer">儲存</button>
+    </div>`;
   });
-  html+='</tbody></table>';
-  el.innerHTML=html;
+  el.innerHTML=html||'<div class="empty-state">尚無品項</div>';
+}
+
+function updateTradeCalc(enc){
+  const p=parseInt((document.getElementById('p_'+enc)||{}).value)||0;
+  const ti=document.getElementById('ti_'+enc);
+  if(ti) ti.value=p?Math.round(p*0.65):'';
 }
 
 function savePrice(enc){
   if(!DB.prices) DB.prices={};
   const name=decodeURIComponent(enc);
-  const pe=document.getElementById('p_'+enc);
-  const fe=document.getElementById('f_'+enc);
-  if(!pe) return;
-  DB.prices[name]={price:parseInt(pe.value)||0,inspFee:parseInt(fe.value)||600};
+  const g=id=>document.getElementById(id+'_'+enc);
+  const parts=((g('pt')||{}).value||'').split('\n').filter(l=>l.trim()).map(l=>{
+    const ci=l.indexOf(':'); if(ci<0) return null;
+    return {name:l.slice(0,ci).trim(),price:parseInt(l.slice(ci+1))||0};
+  }).filter(Boolean);
+  DB.prices[name]={
+    brand:((g('br')||{}).value||'').trim(),
+    model:((g('md')||{}).value||'').trim(),
+    price:parseInt((g('p')||{}).value)||0,
+    tradeInPrice:parseInt((g('ti')||{}).value)||0,
+    inspFee:parseInt((g('f')||{}).value)||600,
+    parts
+  };
   saveData();showNotice('save-notice-price');
+}
+
+function editItemName(oldName){
+  const newName=prompt('請輸入新名稱：',oldName);
+  if(!newName||!newName.trim()||newName.trim()===oldName) return;
+  const n=newName.trim();
+  const idx=DB.items.indexOf(oldName);
+  if(idx>=0) DB.items[idx]=n;
+  DB.app.forEach(r=>{if(r.item===oldName)r.item=n;});
+  DB.func.forEach(r=>{if(r.item===oldName)r.item=n;});
+  if(DB.prices&&DB.prices[oldName]){DB.prices[n]=DB.prices[oldName];delete DB.prices[oldName];}
+  saveData();initSelects();renderItemManageList();renderAdminLists();
 }
 
 function selVerdict(type,v,btn){
