@@ -1226,7 +1226,7 @@ function renderRepairPanel(){
       <div style="background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;padding:12px;margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;color:#95A5A6;margin-bottom:8px">📋 需送修症狀清單</div>
         ${itemsHTML}
-        ${pd.price?`<div style="margin-top:8px;font-size:11px;color:#7F8C8D">商品售價：NT$${pd.price.toLocaleString()} ／ 全虹檢測費：NT$${pd.inspFee}</div>`:''}
+        ${pd.price?`<div style="margin-top:8px;font-size:11px;color:#7F8C8D">商品售價：NT$${pd.price.toLocaleString()} ／ 檢測費：NT$${pd.inspFee}</div>`:''}
       </div>
       <div style="margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:8px">STEP 4 ／ 保固狀態判斷</div>
@@ -1277,16 +1277,17 @@ function renderRepairPanel(){
   if(rfState.warranty&&rfState.damage) updateVerdict(pd.price||0,pd.inspFee||600);
 }
 
-function setRF(k,v){rfState[k]=v;renderRepairPanel();}
+function setRF(k,v){rfState[k]=v;if(k==='warranty'){rfState.damage=null;rfState.partsCost=0;}renderRepairPanel();}
 
 function suggestPartIdxs(repairs,parts){
   if(!repairs.length||!parts.length) return new Set();
-  const causeText=repairs.map(r=>(r.cause||r.symptom||'')).join(' ');
-  const causeWords=causeText.replace(/[（）()\/、，,。：]/g,' ').split(/\s+/).filter(w=>w.length>=2);
+  const causeText=repairs.map(r=>(r.cause||r.symptom||'')).join('');
+  if(!causeText) return new Set();
   const matched=new Set();
   parts.forEach((p,i)=>{
-    const partWords=p.name.replace(/[（）()]/g,' ').split(/[\s\/]+/).filter(w=>w.length>=2);
-    if(partWords.some(pw=>causeWords.some(cw=>cw.includes(pw)||pw.includes(cw)))) matched.add(i);
+    // 拆出中文詞段，對每段取 2-char bigram 掃描 causeText
+    const segs=p.name.replace(/[（）()\s\/0-9A-Za-z]+/g,' ').split(/\s+/).filter(s=>s.length>=2);
+    if(segs.some(seg=>{for(let j=0;j<=seg.length-2;j++)if(causeText.includes(seg.slice(j,j+2)))return true;})) matched.add(i);
   });
   return matched;
 }
@@ -1317,8 +1318,9 @@ function updateVerdict(price,inspFee){
       verdict='💰 RMA保固內但人為損傷 — 照價收費';bg='#FEF9E7';bc='#F39C12';
       details=`保固內人為損傷不在保固範圍。<br>維修費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%${pct>40?'<br>⚠️ 超過售價40%，建議消費者考慮購買新品。':''}`:''}<br>告知消費者費用後由消費者決定是否維修。<br>⚠️ 若消費者不同意維修費用 → 安排寄回，運費雙方各付一半。`;
     } else {
+      const brandName=pd.brand==='422'?'Beutii':(pd.brand||'原廠');
       verdict='✅ RMA 保固維修 — 免費';bg='#EAFAF1';bc='#2ECC71';
-      details=`保固期內非人為損傷，由全虹安排維修，費用由廠商吸收。<br>維修完成後回寄消費者，並記錄維修結果。`;
+      details=`保固期內非人為損傷，由${brandName}安排維修，費用由${brandName}吸收。<br>維修完成後回寄消費者，並記錄維修結果。`;
     }
   } else {
     if(price>0&&pct>40&&d!=='human'){
@@ -1329,7 +1331,7 @@ function updateVerdict(price,inspFee){
       details=`過保且人為損傷，消費者需全額負擔費用。<br>費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%${pct>40?'<br>⚠️ 維修費超過售價40%，建議考慮購買新品。':''}`:''}<br>告知消費者費用後由消費者決定。`;
     } else {
       verdict='🔧 過保維修 — 收費';bg='#EBF5FB';bc='#AED6F1';
-      details=`過保非人為損傷，由全虹收費維修。<br>費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%（${pct<=30?'未超過30%，維修合理':'建議確認是否換新品'}）`:''}`;
+      details=`過保非人為損傷，收費維修。<br>費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%（${pct<=30?'未超過30%，維修合理':'建議確認是否換新品'}）`:''}`;
     }
   }
   vd.innerHTML=`<div style="background:${bg};border:1.5px solid ${bc};border-radius:9px;padding:13px 15px">
@@ -1411,7 +1413,7 @@ function renderPriceAdmin(){
         <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">商品型號</div>${inp('md_'+enc,pd.model,'型號')}</div>
         <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">促價 (NT$)</div>${inp('p_'+enc,pd.price,'0','number')}</div>
         <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">換購價 65% (NT$)</div>${inp('ti_'+enc,pd.tradeInPrice||'','自動計算','number',';background:#F8F9FA')}</div>
-        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">全虹檢測費 (NT$)</div>${inp('f_'+enc,pd.inspFee||600,'600','number')}</div>
+        <div><div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">檢測費 (NT$)</div>${inp('f_'+enc,pd.inspFee||600,'600','number')}</div>
       </div>
       <div style="margin-bottom:10px">
         <div style="font-size:11px;color:#7F8C8D;margin-bottom:3px">零件費細目（每行一筆，格式：名稱:金額）</div>
