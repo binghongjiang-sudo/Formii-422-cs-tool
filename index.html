@@ -612,7 +612,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=9;
+const DATA_VERSION=10;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -1354,7 +1354,7 @@ function updateVerdict(price,inspFee){
       verdict='💰 RMA保固內但人為損傷 — 照價收費';bg='#FEF9E7';bc='#F39C12';
       details=`保固內人為損傷不在保固範圍。<br>維修費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%${pct>40?'<br>⚠️ 超過售價40%，建議消費者考慮購買新品。':''}`:''}<br>告知消費者費用後由消費者決定是否維修。<br>⚠️ 若消費者不同意維修費用 → 安排寄回，運費雙方各付一半。`;
     } else {
-      const brandName=pd.brand==='422'?'Beutii':(pd.brand||'原廠');
+      const _item=getItem()||''; const brandName=/^(422|beutii)/i.test(_item)?'Beutii':(/^formii/i.test(_item)?'Formii':'品牌');
       verdict='✅ RMA 保固維修 — 免費';bg='#EAFAF1';bc='#2ECC71';
       details=`保固期內非人為損傷，由${brandName}安排維修，費用由${brandName}吸收。<br>維修完成後回寄消費者，並記錄維修結果。`;
     }
@@ -1544,7 +1544,7 @@ function renderItemManageList(){
       const fc=DB.func.filter(r=>r.item===name).length;
       html+=`<div class="item-manage-row" style="border-left:3px solid #2980B9">
         <div><div class="item-manage-name">${name}</div><div class="item-manage-count">外觀 ${ac} 項・功能性 ${fc} 項</div></div>
-        <button class="btn-edit-item" onclick="editItemName('${name}')">改名</button><button class="btn-del-item" onclick="delItem('${name}')">刪除</button>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><button class="btn-edit-item" style="margin-right:0" onclick="editItemName('${name}')">改名</button><button class="btn-del-item" onclick="delItem('${name}')">刪除</button></div>
       </div>`;
     });
   });
