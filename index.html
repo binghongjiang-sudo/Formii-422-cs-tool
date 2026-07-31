@@ -603,7 +603,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=4;
+const DATA_VERSION=5;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -1238,13 +1238,38 @@ function renderRepairPanel(){
       </div>
       <div style="${rfState.damage?'':'opacity:.4;pointer-events:none'}">
         <div style="font-size:11px;font-weight:700;color:#C0392B;margin-bottom:8px">STEP 6 ／ 成本比對與最終建議</div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-          <span style="font-size:12px;color:#5D6D7E">備品零件費用 NT$</span>
-          <input type="number" min="0" placeholder="0" value="${rfState.partsCost||''}"
-            style="width:110px;padding:6px 10px;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;font-family:inherit;color:#1C2833"
-            oninput="rfState.partsCost=parseInt(this.value)||0;updateVerdict(${pd.price||0},${pd.inspFee||600})">
-          <span style="font-size:11px;color:#95A5A6">（全虹估價後填入）</span>
-        </div>
+        ${(()=>{
+          const parts=pd.parts&&pd.parts.length?pd.parts:null;
+          if(parts){
+            const suggested=suggestPartIdxs(repairs,parts);
+            const initTotal=parts.reduce((s,p,i)=>suggested.has(i)?s+p.price:s,0);
+            rfState.partsCost=initTotal;
+            const rows=parts.map((p,i)=>{
+              const isSug=suggested.has(i);
+              return `<label style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F0F2F5;cursor:pointer;${isSug?'background:#FFFDE7;margin:0 -12px;padding:7px 12px;':''}">
+                <input type="checkbox" data-price="${p.price}" onchange="updatePartsTotal(${pd.price||0},${pd.inspFee||600})" ${isSug?'checked':''} style="width:15px;height:15px;accent-color:#1C2833;cursor:pointer;flex-shrink:0">
+                <span style="flex:1;font-size:12px;color:#1C2833">${isSug?'⭐ ':''}<strong>${p.name}</strong></span>
+                <span style="font-size:12px;font-weight:600;color:#5D6D7E">NT$${p.price.toLocaleString()}</span>
+              </label>`;
+            }).join('');
+            return `<div style="font-size:11px;color:#7F8C8D;margin-bottom:6px">零件費用（⭐ 系統建議項目已預勾，可自行調整）</div>
+            <div style="background:#F8F9FA;border:1px solid #E8EAED;border-radius:8px;padding:8px 12px;margin-bottom:10px;overflow:hidden" id="parts-list">
+              ${rows}
+              <div style="display:flex;justify-content:flex-end;align-items:center;padding-top:8px;gap:8px">
+                <span style="font-size:11px;color:#7F8C8D">零件合計</span>
+                <span id="parts-total" style="font-size:14px;font-weight:700;color:#1C2833">NT$${initTotal.toLocaleString()}</span>
+              </div>
+            </div>`;
+          } else {
+            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+              <span style="font-size:12px;color:#5D6D7E">零件費用 NT$</span>
+              <input type="number" min="0" placeholder="0" value="${rfState.partsCost||''}"
+                style="width:110px;padding:6px 10px;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;font-family:inherit;color:#1C2833"
+                oninput="rfState.partsCost=parseInt(this.value)||0;updateVerdict(${pd.price||0},${pd.inspFee||600})">
+              <span style="font-size:11px;color:#95A5A6">（估價後填入）</span>
+            </div>`;
+          }
+        })()}
         <div id="repair-verdict"></div>
       </div>
     </div>
@@ -1253,6 +1278,28 @@ function renderRepairPanel(){
 }
 
 function setRF(k,v){rfState[k]=v;renderRepairPanel();}
+
+function suggestPartIdxs(repairs,parts){
+  if(!repairs.length||!parts.length) return new Set();
+  const causeText=repairs.map(r=>(r.cause||r.symptom||'')).join(' ');
+  const causeWords=causeText.replace(/[（）()\/、，,。：]/g,' ').split(/\s+/).filter(w=>w.length>=2);
+  const matched=new Set();
+  parts.forEach((p,i)=>{
+    const partWords=p.name.replace(/[（）()]/g,' ').split(/[\s\/]+/).filter(w=>w.length>=2);
+    if(partWords.some(pw=>causeWords.some(cw=>cw.includes(pw)||pw.includes(cw)))) matched.add(i);
+  });
+  return matched;
+}
+
+function updatePartsTotal(price,inspFee){
+  const checks=document.querySelectorAll('#parts-list input[type="checkbox"]');
+  let total=0;
+  checks.forEach(c=>{if(c.checked) total+=parseInt(c.dataset.price)||0;});
+  rfState.partsCost=total;
+  const el=document.getElementById('parts-total');
+  if(el) el.textContent='NT$'+total.toLocaleString();
+  updateVerdict(price,inspFee);
+}
 
 function updateVerdict(price,inspFee){
   const vd=document.getElementById('repair-verdict');if(!vd)return;
