@@ -612,7 +612,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 /* ══════════════════════════════════════════════════
    DEFAULT DATA
 ══════════════════════════════════════════════════ */
-const DATA_VERSION=13;
+const DATA_VERSION=14;
 const DEFAULT_DATA={
   items:["吹風機","電鍋","果汁機","電熱水壺","咖啡機","電烤箱","手持風扇","循環扇","立扇","蒸氣烤箱","掛燙機","電暖器","空氣清淨機","除濕機","Formii 7吋擺頭空氣循環扇","Formii 12吋全方位DC直流循環立扇","Beutii 蒸氣烤箱 Master Pro"],
   prices:{
@@ -1140,7 +1140,7 @@ function answerWizard(key,answer){
     ws.step++;
     if(ws.step>=row.steps.length){ws.result='amber';ws.tip='無法確認，請安排回倉確認';}
   } else {
-    ws.result=outcome.type;ws.tip=outcome.tip||'';ws.cause=outcome.cause||null;
+    ws.result=outcome.type;ws.tip=outcome.tip||'';ws.cause=outcome.cause||null;ws.parts=outcome.parts||null;
   }
   renderBoth();renderRepairPanel();
 }
@@ -1241,13 +1241,13 @@ function getRepairItems(){
     if(!row.steps) return;
     const k=prefix+'c'+i;
     const ws=wizardState[k];
-    if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip});
+    if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
   });
   spec.forEach((row,i)=>{
     if(!row.steps) return;
     const k=prefix+'s'+i;
     const ws=wizardState[k];
-    if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip});
+    if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
   });
   return repairs;
 }
