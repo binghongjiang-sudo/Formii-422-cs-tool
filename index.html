@@ -1872,6 +1872,9 @@ function answerWizard(key,answer){
     ws.result=outcome.type;ws.tip=outcome.tip||'';ws.cause=outcome.cause||null;ws.parts=outcome.parts||null;
   }
   renderBoth();renderRepairPanel();
+  if(ws.result==='repair'||ws.result==='amber'||ws.result==='warn'){
+    setTimeout(()=>{const el=document.getElementById('sc-flow-area');if(el&&el.innerHTML)el.scrollIntoView({behavior:'smooth',block:'start'});},150);
+  }
 }
 
 function backWizard(key){
