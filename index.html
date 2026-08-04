@@ -426,11 +426,6 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
             </div>
           </div>
         </div>
-        <div class="legend">
-          <div class="legend-item"><div class="l-dot d-ok2"></div>可排除 / 正常耗損</div>
-          <div class="legend-item"><div class="l-dot d-amb2"></div>灰色地帶，需確認</div>
-          <div class="legend-item"><div class="l-dot d-warn2"></div>人為損傷 / 安全疑慮</div>
-        </div>
       </div>
       <div id="summary-area"></div>
       <div id="sc-flow-area"></div>
@@ -2003,7 +1998,7 @@ function renderRepairPanel(){
     `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.damage===v?'#1C2833':'#D5D8DC'};background:${rfState.damage===v?'#1C2833':'#fff'};color:${rfState.damage===v?'#fff':'#1C2833'}" onclick="setRF('damage','${v}')">${l}</button>`
   ).join('');
   area.innerHTML=`<div class="sc-flow show">
-    <div class="sc-flow-head"><div class="step-num" style="background:#C0392B">4</div><div class="sc-flow-title">送修判斷流程 — STEP 4-6</div></div>
+    <div class="sc-flow-head"><div class="step-num" style="background:#C0392B">4</div><div class="sc-flow-title">回倉判斷流程 — STEP 4-6</div></div>
     <div class="sc-flow-body">
       <div style="background:#F8F9FA;border-radius:8px;border:1px solid #E8EAED;padding:12px;margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;color:#95A5A6;margin-bottom:8px">📋 需送修症狀清單</div>
