@@ -1728,15 +1728,12 @@ function renderRepairPanel(){
   if(!repairs.length){area.innerHTML='';renderScFlow();return;}
   const pd=(DB.prices&&DB.prices[item])||{price:0,inspFee:600};
   const itemsHTML=repairs.map(r=>`<div style="padding:6px 0;border-bottom:1px solid #F0F2F5;font-size:12px"><strong>${r.symptom}</strong>　${r.cause?'— '+r.cause:''}</div>`).join('');
-  const wBtns=[['doa','DOA（到貨即壞）'],['rma','RMA 保固內'],['expired','過保']].map(([v,l])=>
+  const wBtns=[['doa','7日內（到貨即換）'],['rma','保固內'],['expired','過保']].map(([v,l])=>
     `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.warranty===v?'#1C2833':'#D5D8DC'};background:${rfState.warranty===v?'#1C2833':'#fff'};color:${rfState.warranty===v?'#fff':'#1C2833'}" onclick="setRF('warranty','${v}')">${l}</button>`
   ).join('');
-  const isDOA=rfState.warranty==='doa';
-  const dBtns=isDOA
-    ?`<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:default;border:1.5px solid #1C2833;background:#1C2833;color:#fff">非人為損傷</button><button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:default;border:1.5px solid #E8EAED;background:#F8F9FA;color:#BDC3C7" disabled>人為損傷</button><span style="font-size:10px;color:#95A5A6;align-self:center">🔒 DOA 自動判定</span>`
-    :[['nonhuman','非人為損傷'],['human','人為損傷']].map(([v,l])=>
-      `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.damage===v?'#1C2833':'#D5D8DC'};background:${rfState.damage===v?'#1C2833':'#fff'};color:${rfState.damage===v?'#fff':'#1C2833'}" onclick="setRF('damage','${v}')">${l}</button>`
-    ).join('');
+  const dBtns=[['nonhuman','非人為損傷'],['human','人為損傷']].map(([v,l])=>
+    `<button style="padding:8px 14px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;cursor:pointer;border:1.5px solid ${rfState.damage===v?'#1C2833':'#D5D8DC'};background:${rfState.damage===v?'#1C2833':'#fff'};color:${rfState.damage===v?'#fff':'#1C2833'}" onclick="setRF('damage','${v}')">${l}</button>`
+  ).join('');
   area.innerHTML=`<div class="sc-flow show">
     <div class="sc-flow-head"><div class="step-num" style="background:#C0392B">4</div><div class="sc-flow-title">送修判斷流程 — STEP 4-6</div></div>
     <div class="sc-flow-body">
@@ -1794,7 +1791,7 @@ function renderRepairPanel(){
   if(rfState.warranty&&rfState.damage) updateVerdict(pd.price||0,pd.inspFee||600);
 }
 
-function setRF(k,v){rfState[k]=v;if(k==='warranty'){rfState.damage=v==='doa'?'nonhuman':null;rfState.partsCost=0;}renderRepairPanel();}
+function setRF(k,v){rfState[k]=v;if(k==='warranty'){rfState.damage=null;rfState.partsCost=0;}renderRepairPanel();}
 
 function suggestPartIdxs(repairs,parts){
   if(!repairs.length||!parts.length) return new Set();
@@ -1837,16 +1834,22 @@ function updateVerdict(price,inspFee){
   const SHIP_BEUTII='🚚 運費負擔：Beutii 全額負擔（寄送＋寄回）';
   const SHIP_RMA='🚚 運費負擔：消費者負擔寄送 ／ Beutii 負擔寄回';
   if(w==='doa'){
-    verdict='🔄 DOA — 換機處理';bg='#EAFAF1';bc='#2ECC71';shipping=SHIP_BEUTII;
-    details=`保固期內（DOA），屬製造問題 → 安排換良品或退款。<br>${d==='human'?'⚠️ 注意：若確認為人為損傷，需另行處理。':'非人為確認，直接安排換機。'}`;
+    shipping=SHIP_BEUTII;
+    if(d==='human'){
+      verdict='⚠️ 7日內到貨 + 人為損傷 — 需確認';bg='#FEF9E7';bc='#F39C12';
+      details=`7日內到貨但確認為人為損傷，需上報主管確認處理方式。<br>拍照記錄損壞狀況，由主管決定是否換機或收費維修。`;
+    } else {
+      verdict='🔄 7日內到貨即換 — 換機處理';bg='#EAFAF1';bc='#2ECC71';
+      details=`7日內到貨即換，屬製造/運送問題 → 安排換良品或退款。<br>拍照記錄損壞狀況後直接安排換機，Beutii全額負擔運費。`;
+    }
   } else if(w==='rma'){
     shipping=SHIP_RMA;
     if(d==='human'){
-      verdict='💰 RMA保固內但人為損傷 — 照價收費';bg='#FEF9E7';bc='#F39C12';
+      verdict='💰 保固內人為損傷 — 照價收費';bg='#FEF9E7';bc='#F39C12';
       details=`保固內人為損傷不在保固範圍。<br>維修費用估計：NT$${total.toLocaleString()}（檢測費NT$${inspFee}+零件NT$${parts}）${price?`<br>佔售價比例：${pct}%${pct>40?'<br>⚠️ 超過售價40%，建議消費者考慮購買新品。':''}`:''}<br>告知消費者費用後由消費者決定是否維修。`;
     } else {
       const _item=getItem()||''; const brandName=/^(422|beutii)/i.test(_item)?'Beutii':(/^formii/i.test(_item)?'Formii':'品牌');
-      verdict='✅ RMA 保固維修 — 免費';bg='#EAFAF1';bc='#2ECC71';
+      verdict='✅ 保固內維修 — 免費';bg='#EAFAF1';bc='#2ECC71';
       details=`保固期內非人為損傷，由${brandName}安排維修，費用由${brandName}吸收。<br>維修完成後回寄消費者，並記錄維修結果。`;
     }
   } else {
