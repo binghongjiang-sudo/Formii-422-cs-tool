@@ -500,7 +500,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
             <div class="form-label">判定類別</div>
             <div class="verdict-select" id="app-verdict-sel">
               <button class="vs-btn" onclick="selVerdict('app','warn',this)">人為損傷</button>
-              <button class="vs-btn" onclick="selVerdict('app','amber',this)">灰色地帶</button>
+              <button class="vs-btn" onclick="selVerdict('app','amber',this)">需回倉確認</button>
               <button class="vs-btn" onclick="selVerdict('app','ok',this)">正常耗損</button>
             </div>
           </div>
@@ -1795,8 +1795,8 @@ function mkWizardItem(row,key){
   const ws=wizardState[key]||null;
   const result=ws?ws.result:null;
   const rCls={ok:'state-ok',amber:'state-amber',warn:'state-warn',repair:'state-amber'}[result]||'';
-  const rLabel={ok:'✅ 線上排除',amber:'⚠️ 灰色回倉',warn:'🚨 安全疑慮',repair:'🔧 需送修判斷'}[result]||'';
-  const ac={ok:'action-ok',amber:'action-amber',warn:'action-warn',repair:'action-warn'}[result]||'action-amber';
+  const rLabel={ok:'✅ 線上排除',amber:'📋 建議回倉確認',warn:'🚨 安全疑慮',repair:'🔧 需回倉送修'}[result]||'';
+  const ac={ok:'action-ok',amber:'action-warn',warn:'action-warn',repair:'action-warn'}[result]||'action-warn';
   let bodyHTML='';
   if(ws&&ws.open&&!result){
     const s=ws.step||0;
@@ -1816,7 +1816,7 @@ function mkWizardItem(row,key){
       ${backBtnQ}
     </div>`;
   } else if(ws&&ws.open&&result){
-    const tipMap={ok:{bg:'#EAFAF1',bc:'#2ECC71',tc:'#1E8449',icon:'✅'},amber:{bg:'#F1EFE8',bc:'#888780',tc:'#444441',icon:'⚠️'},warn:{bg:'#FDEDEC',bc:'#E74C3C',tc:'#C0392B',icon:'🚨'},repair:{bg:'#F3E5F5',bc:'#9b59b6',tc:'#6C3483',icon:'🔧'}};
+    const tipMap={ok:{bg:'#EAFAF1',bc:'#2ECC71',tc:'#1E8449',icon:'✅'},amber:{bg:'#F3E5F5',bc:'#9b59b6',tc:'#6C3483',icon:'📋'},warn:{bg:'#FDEDEC',bc:'#E74C3C',tc:'#C0392B',icon:'🚨'},repair:{bg:'#F3E5F5',bc:'#9b59b6',tc:'#6C3483',icon:'🔧'}};
     const tm=tipMap[result]||tipMap.amber;
     bodyHTML=`<div style="margin-top:10px;padding:12px;background:${tm.bg};border:1.5px solid ${tm.bc};border-radius:8px">
       <div style="font-weight:700;color:${tm.tc};margin-bottom:6px">${tm.icon} ${rLabel}</div>
@@ -1933,7 +1933,7 @@ function renderSummary(){
   </div>`;
   let vf='';
   if(wC>0) vf=`<div class="verdict-final vf-warn"><div class="vf-title">需立即處理（${wC} 項）</div>已發現人為損傷或安全疑慮，請拍照記錄並依各項目建議執行，如有安全疑慮請通知消費者立即停止使用。</div>`;
-  else if(aC>0) vf=`<div class="verdict-final vf-amber"><div class="vf-title">需進一步確認（${aC} 項）</div>存在灰色地帶項目，建議上報主管或安排回倉檢測，不可單方面拒絕換貨。</div>`;
+  else if(aC>0) vf=`<div class="verdict-final vf-amber"><div class="vf-title">需回倉確認（${aC} 項）</div>存在需進一步確認的項目，建議上報主管並安排回倉檢測，依結果決定後續處理方式。</div>`;
   else vf=`<div class="verdict-final vf-ok"><div class="vf-title">所有項目均可線上排除（${oC} 項）</div>請繼續引導消費者確認其他功能是否正常，並記錄本次案例。</div>`;
   area.innerHTML=`<div class="summary-card">
     <div class="summary-head"><div class="summary-head-title">處理摘要　—　${item}</div>
@@ -1970,13 +1970,13 @@ function getRepairItems(){
       if(!row.steps) return;
       const k=pfx+'c'+i;
       const ws=wizardState[k];
-      if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
+      if(ws&&(ws.result==='repair'||ws.result==='amber')) repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
     });
     spec.forEach((row,i)=>{
       if(!row.steps) return;
       const k=pfx+'s'+i;
       const ws=wizardState[k];
-      if(ws&&ws.result==='repair') repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
+      if(ws&&(ws.result==='repair'||ws.result==='amber')) repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
     });
   }
   _scan(DB.func,'func_'+item+'_');
@@ -2340,7 +2340,7 @@ function renderAdminAppList(){
   el.innerHTML=rows.map(r=>{
     const realIdx=DB.app.indexOf(r);
     const vc=r.v==='warn'?'v-warn':r.v==='amber'?'v-amber':'v-ok';
-    const vl=r.v==='warn'?'人為損傷':r.v==='amber'?'灰色地帶':'正常耗損';
+    const vl=r.v==='warn'?'人為損傷':r.v==='amber'?'需回倉確認':'正常耗損';
     const tagCls=r.item==='通用'?'itag-common':'itag-item';
     return `<div class="admin-item ${vc}">
       <div class="admin-item-body">
@@ -2457,7 +2457,7 @@ function emAddStep(){
 function editAppItem(idx){
   const r=DB.app[idx];
   _editState={type:'app',idx,v:r.v};
-  const vOpts=[{v:'warn',l:'人為損傷'},{v:'amber',l:'灰色地帶'},{v:'ok',l:'正常耗損'}];
+  const vOpts=[{v:'warn',l:'人為損傷'},{v:'amber',l:'需回倉確認'},{v:'ok',l:'正常耗損'}];
   document.getElementById('em-title').textContent='編輯外觀項目';
   document.getElementById('em-body').innerHTML=`
     <div class="form-row"><div><div class="form-label">零件名稱</div><input id="em-p" value="${esc(r.p)}" style="width:100%;box-sizing:border-box"></div></div>
