@@ -158,6 +158,26 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
 .btn-add.green{background:#1E8449}
 .btn-add.green:hover{background:#176437}
 
+/* Admin wizard accordion */
+.adm-wizard-list{display:flex;flex-direction:column;gap:6px;max-height:600px;overflow-y:auto;padding-right:2px}
+.adm-wizard-card{border:1px solid #E8EAED;border-radius:10px;overflow:hidden;background:#fff}
+.adm-wizard-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;transition:background .12s}
+.adm-wizard-header:hover{background:#F8F9FA}
+.adm-arr{font-size:10px;color:#95A5A6;flex-shrink:0;width:12px;transition:transform .15s}
+.adm-wizard-title{flex:1;font-size:12px;font-weight:700;color:#1C2833}
+.adm-step-badge{font-size:10px;background:#EBF5FB;color:#1A5276;padding:1px 6px;border-radius:10px;flex-shrink:0}
+.adm-actions{display:flex;gap:2px;flex-shrink:0}
+.adm-wizard-body{padding:8px 12px 12px;border-top:1px solid #F0F2F5;background:#FAFBFC}
+.adm-step-preview{padding:6px 0;border-bottom:1px solid #F0F2F5}
+.adm-step-preview:last-child{border-bottom:none}
+.adm-step-num{font-size:10px;font-weight:700;color:#7F8C8D;margin-bottom:3px}
+.adm-step-q{font-size:11px;color:#1C2833;line-height:1.5;margin-bottom:4px}
+.adm-step-outcomes{display:flex;flex-direction:column;gap:2px}
+.adm-outcome{font-size:10px;color:#5D6D7E;line-height:1.4}
+.adm-outcome em{font-style:normal;color:#1A5276;font-weight:600}
+.adm-new-btn{width:100%;padding:10px;font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;background:#1C2833;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-bottom:14px}
+.adm-new-btn:hover{background:#2C3E50}
+
 /* Item list in admin */
 .admin-item-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;padding-right:2px}
 .admin-item{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:8px;border:1px solid #E8EAED;background:#fff;font-size:12px}
@@ -482,112 +502,36 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
         <div id="price-list"></div>
       </div>
 
-      <!-- Tab: 新增外觀項目 -->
+      <!-- Tab: 外觀項目（wizard 編輯） -->
       <div id="admin-tab-app" class="card-body" style="display:none">
         <div class="save-notice" id="save-notice-app">已儲存</div>
         <div style="background:#EAFAF1;border-left:4px solid #1E8449;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#145A32;line-height:1.7">
-          <strong>📍 對應操作者介面：STEP 3（外觀類勾選 / 多步驟判斷）</strong><br>
-          此處新增的外觀項目，會出現在操作者 STEP 3「外觀類」欄位，供客服逐步判斷是否人為損傷或安全疑慮。
+          <strong>📍 對應操作者介面：STEP 3（外觀類 多步驟引導判斷）</strong><br>
+          下方清單與操作者 STEP 3「外觀類」呈現一致。點擊項目可展開預覽步驟流程，點擊 ✏ 進行完整編輯（問題、按鈕標籤、各步驟結論說明）。
         </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">套用品項</div>
-            <select id="app-target-item">
-              <option value="通用">通用（所有品項共用）</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row cols-2">
-          <div>
-            <div class="form-label">部位名稱</div>
-            <input id="app-part" placeholder="例如：機身外殼、出風口">
-          </div>
-          <div>
-            <div class="form-label">損傷項目</div>
-            <input id="app-damage" placeholder="例如：裂縫或破損">
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">判定類別</div>
-            <div class="verdict-select" id="app-verdict-sel">
-              <button class="vs-btn" onclick="selVerdict('app','warn',this)">人為損傷</button>
-              <button class="vs-btn" onclick="selVerdict('app','amber',this)">需回倉確認</button>
-              <button class="vs-btn" onclick="selVerdict('app','ok',this)">正常耗損</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">處理建議（客服參考）</div>
-            <input id="app-tip" placeholder="例如：拍照記錄，不予換貨">
-          </div>
-        </div>
-        <button class="btn-add" onclick="addAppItem()">＋ 新增外觀項目</button>
-
-        <div class="divider"></div>
-        <div class="form-label" style="margin-bottom:8px">現有外觀項目　<span style="font-weight:400;color:#95A5A6">（可刪除）</span></div>
-        <div class="form-row">
-          <select id="app-filter-item" onchange="renderAdminAppList()">
-            <option value="">全部顯示</option>
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+          <select id="app-filter-item" onchange="renderAdminAppList()" style="flex:1;font-family:'Noto Sans TC',sans-serif;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;padding:8px 12px">
+            <option value="">全部品項顯示</option>
           </select>
+          <button class="adm-new-btn" onclick="newWizardItem('app')" style="width:auto;white-space:nowrap;padding:9px 16px;margin-bottom:0">＋ 新增外觀項目</button>
         </div>
-        <div class="admin-item-list" id="admin-app-list"></div>
+        <div class="adm-wizard-list" id="admin-app-list"></div>
       </div>
 
-      <!-- Tab: 新增功能性項目 -->
+      <!-- Tab: 功能性項目（wizard 編輯） -->
       <div id="admin-tab-func" class="card-body" style="display:none">
         <div class="save-notice" id="save-notice-func">已儲存</div>
         <div style="background:#EAFAF1;border-left:4px solid #1E8449;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#145A32;line-height:1.7">
-          <strong>📍 對應操作者介面：STEP 3（功能性類勾選 / 多步驟判斷）</strong><br>
-          此處新增的功能性項目，會出現在操作者 STEP 3「功能性類」欄位，判斷結果若為紫色或紅色，將自動觸發 STEP 4-6 回倉流程。
+          <strong>📍 對應操作者介面：STEP 3（功能性類 多步驟引導判斷）</strong><br>
+          下方清單與操作者 STEP 3「功能性類」呈現一致。點擊項目可展開預覽步驟流程，點擊 ✏ 進行完整編輯（問題、按鈕標籤、各步驟結論說明文字）。
         </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">套用品項</div>
-            <select id="func-target-item">
-              <option value="通用">通用（所有品項共用）</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">問題現象</div>
-            <input id="func-problem" placeholder="例如：加熱後自動斷電">
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">客服確認步驟</div>
-            <textarea id="func-steps" placeholder="例如：確認插頭是否插好；確認電源開關是否正確撥動" rows="2"></textarea>
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">線上可排除？</div>
-            <div class="verdict-select" id="func-verdict-sel">
-              <button class="vs-btn" onclick="selVerdict('func','ok',this)">可線上排除</button>
-              <button class="vs-btn" onclick="selVerdict('func','amber',this)">需進一步確認</button>
-              <button class="vs-btn" onclick="selVerdict('func','warn',this)">需回倉（安全）</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div>
-            <div class="form-label">排除方法 / 處理建議</div>
-            <input id="func-tip" placeholder="例如：重新插電後觀察是否恢復正常">
-          </div>
-        </div>
-        <button class="btn-add" onclick="addFuncItem()">＋ 新增功能性項目</button>
-
-        <div class="divider"></div>
-        <div class="form-label" style="margin-bottom:8px">現有功能性項目　<span style="font-weight:400;color:#95A5A6">（可刪除）</span></div>
-        <div class="form-row">
-          <select id="func-filter-item" onchange="renderAdminFuncList()">
-            <option value="">全部顯示</option>
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+          <select id="func-filter-item" onchange="renderAdminFuncList()" style="flex:1;font-family:'Noto Sans TC',sans-serif;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;padding:8px 12px">
+            <option value="">全部品項顯示</option>
           </select>
+          <button class="adm-new-btn" onclick="newWizardItem('func')" style="width:auto;white-space:nowrap;padding:9px 16px;margin-bottom:0">＋ 新增功能性項目</button>
         </div>
-        <div class="admin-item-list" id="admin-func-list"></div>
+        <div class="adm-wizard-list" id="admin-func-list"></div>
       </div>
     </div>
   
@@ -596,7 +540,7 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
         <div class="save-notice" id="save-notice-sc">已儲存</div>
         <div style="background:#FEF9E7;border-left:4px solid #D4AC0D;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#7D6608;line-height:1.7">
           <strong>📍 對應操作者介面：STEP 4（保固狀態）→ STEP 5（損傷判斷）</strong><br>
-          此處設定各商品的回倉情境腳本，對應操作者在 STEP 4 選擇保固狀態、STEP 5 判斷損傷類型後顯示的標準處理話術與流程。
+          此處設定各商品在 STEP 5 非人為／人為損傷判斷後，顯示給操作者的標準處理話術與後續流程腳本。STEP 4 保固選擇、STEP 5 損傷判斷邏輯為系統固定流程，不在此設定範圍內。
         </div>
         <div style="padding:4px 0 14px">
           <div class="form-label" style="margin-bottom:6px">選擇商品</div>
@@ -1763,9 +1707,10 @@ function initSelects(){
   DB.items.forEach(it=>{ const b=getBrand(it); if(!grouped[b])grouped[b]=[]; grouped[b].push(it); });
   brandOrder.forEach(brand=>{ if(!grouped[brand]||!grouped[brand].length) return; const og=document.createElement('optgroup'); og.label=brand; grouped[brand].forEach(it=>{ const o=document.createElement('option'); o.textContent=it; og.appendChild(o); }); sel.appendChild(og); });
 
-  // Admin target selects
+  // Admin target selects (may not exist if old flat form removed)
   ['app-target-item','func-target-item'].forEach(id=>{
     const s=document.getElementById(id);
+    if(!s) return;
     s.innerHTML='<option value="通用">通用（所有品項共用）</option>';
     DB.items.forEach(it=>{ const o=document.createElement('option'); o.value=it; o.textContent=it; s.appendChild(o); });
   });
@@ -2359,21 +2304,40 @@ function renderAdminAppList(){
   const filter=document.getElementById('app-filter-item').value;
   const el=document.getElementById('admin-app-list');
   const rows=filter?DB.app.filter(r=>r.item===filter):DB.app;
-  if(!rows.length){ el.innerHTML='<div class="empty-state">尚無外觀項目</div>'; return; }
-  el.innerHTML=rows.map(r=>{
+  if(!rows.length){el.innerHTML='<div class="empty-state">尚無外觀項目</div>';return;}
+  let html='';
+  rows.forEach(r=>{
     const realIdx=DB.app.indexOf(r);
-    const vc=r.v==='warn'?'v-warn':r.v==='amber'?'v-amber':'v-ok';
-    const vl=r.v==='warn'?'人為損傷':r.v==='amber'?'需回倉確認':'正常耗損';
     const tagCls=r.item==='通用'?'itag-common':'itag-item';
-    return `<div class="admin-item ${vc}">
-      <div class="admin-item-body">
-        <div class="admin-item-title"><span class="itag ${tagCls}">${r.item}</span>${r.p}・${r.d}</div>
-        <div class="admin-item-sub">${vl}</div>
-        <div class="admin-item-tip">處理建議：${r.tip}</div>
+    const stepCount=r.steps?r.steps.length:0;
+    const hasSteps=!!r.steps;
+    const bodyId='aadm-'+realIdx;
+    const arrId='aarr-'+realIdx;
+    html+=`<div class="adm-wizard-card">
+      <div class="adm-wizard-header" onclick="toggleAdminItem('${bodyId}','${arrId}')">
+        <span class="adm-arr" id="${arrId}">▶</span>
+        <span class="itag ${tagCls}">${r.item}</span>
+        <span class="adm-wizard-title">${r.p}</span>
+        ${hasSteps?`<span class="adm-step-badge">${stepCount} 步驟</span>`:''}
+        <div class="adm-actions">
+          <button class="edit-btn-sm" onclick="event.stopPropagation();editAppItem(${realIdx})" title="編輯">✏</button>
+          <button class="del-btn" onclick="event.stopPropagation();delAppItem(${realIdx})" title="刪除">×</button>
+        </div>
       </div>
-      <button class="edit-btn-sm" onclick="editAppItem(${realIdx})" title="編輯">✏</button><button class="del-btn" onclick="delAppItem(${realIdx})" title="刪除">×</button>
+      <div class="adm-wizard-body" id="${bodyId}" style="display:none">
+        ${hasSteps?r.steps.map((s,si)=>`
+          <div class="adm-step-preview">
+            <div class="adm-step-num">步驟 ${si+1}</div>
+            <div class="adm-step-q">${esc(s.q||'')}</div>
+            <div class="adm-step-outcomes">
+              <span class="adm-outcome">✔ ${esc(s.yL||'是')} → ${s.yes?`<em>${_admOutcomeLabel(s.yes)}</em>`:'<em>繼續下一題</em>'}</span>
+              <span class="adm-outcome">✘ ${esc(s.nL||'否')} → ${s.no?`<em>${_admOutcomeLabel(s.no)}</em>`:'<em>繼續下一題</em>'}</span>
+            </div>
+          </div>`).join(''):'<div style="color:#95A5A6;font-size:12px;padding:8px 0">無步驟資料</div>'}
+      </div>
     </div>`;
-  }).join('');
+  });
+  el.innerHTML=html;
 }
 
 /* ── 功能性項目管理 ── */
@@ -2402,24 +2366,40 @@ function renderAdminFuncList(){
   const filter=document.getElementById('func-filter-item').value;
   const el=document.getElementById('admin-func-list');
   const rows=filter?DB.func.filter(r=>r.item===filter):DB.func;
-  if(!rows.length){ el.innerHTML='<div class="empty-state">尚無功能性項目</div>'; return; }
-  el.innerHTML=rows.map(r=>{
+  if(!rows.length){el.innerHTML='<div class="empty-state">尚無功能性項目</div>';return;}
+  let html='';
+  rows.forEach(r=>{
     const realIdx=DB.func.indexOf(r);
-    const vc=r.v==='warn'?'v-warn':r.v==='amber'?'v-amber':'v-ok';
-    const vl=r.v==='warn'?'需回倉（安全）':r.v==='amber'?'需進一步確認':'可線上排除';
     const tagCls=r.item==='通用'?'itag-common':'itag-item';
-    const isWizard=!!r.steps;
-    const subLine=isWizard?`多步驟判斷（${r.steps.length}題）`:(r.d||'');
-    const vcLine=isWizard?'逐步引導判斷':`${vl}　・　${r.tip||''}`;
-    return `<div class="admin-item ${isWizard?'v-amber':vc}">
-      <div class="admin-item-body">
-        <div class="admin-item-title"><span class="itag ${tagCls}">${r.item}</span>${r.p}${isWizard?'　<span style="font-size:11px;color:#7F8C8D;font-weight:400">🔀 步驟判斷</span>':''}</div>
-        <div class="admin-item-sub">${subLine}</div>
-        <div class="admin-item-sub" style="margin-top:2px">${vcLine}</div>
+    const stepCount=r.steps?r.steps.length:0;
+    const hasSteps=!!r.steps;
+    const bodyId='fadm-'+realIdx;
+    const arrId='farr-'+realIdx;
+    html+=`<div class="adm-wizard-card">
+      <div class="adm-wizard-header" onclick="toggleAdminItem('${bodyId}','${arrId}')">
+        <span class="adm-arr" id="${arrId}">▶</span>
+        <span class="itag ${tagCls}">${r.item}</span>
+        <span class="adm-wizard-title">${r.p}</span>
+        ${hasSteps?`<span class="adm-step-badge">${stepCount} 步驟</span>`:''}
+        <div class="adm-actions">
+          <button class="edit-btn-sm" onclick="event.stopPropagation();editFuncItem(${realIdx})" title="編輯">✏</button>
+          <button class="del-btn" onclick="event.stopPropagation();delFuncItem(${realIdx})" title="刪除">×</button>
+        </div>
       </div>
-      <button class="edit-btn-sm" onclick="editFuncItem(${realIdx})" title="編輯">✏</button><button class="del-btn" onclick="delFuncItem(${realIdx})" title="刪除">×</button>
+      <div class="adm-wizard-body" id="${bodyId}" style="display:none">
+        ${hasSteps?r.steps.map((s,si)=>`
+          <div class="adm-step-preview">
+            <div class="adm-step-num">步驟 ${si+1}</div>
+            <div class="adm-step-q">${esc(s.q||'')}</div>
+            <div class="adm-step-outcomes">
+              <span class="adm-outcome">✔ ${esc(s.yL||'是')} → ${s.yes?`<em>${_admOutcomeLabel(s.yes)}</em>`:'<em>繼續下一題</em>'}</span>
+              <span class="adm-outcome">✘ ${esc(s.nL||'否')} → ${s.no?`<em>${_admOutcomeLabel(s.no)}</em>`:'<em>繼續下一題</em>'}</span>
+            </div>
+          </div>`).join(''):'<div style="color:#95A5A6;font-size:12px;padding:8px 0">無步驟資料</div>'}
+      </div>
     </div>`;
-  }).join('');
+  });
+  el.innerHTML=html;
 }
 
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
@@ -2479,14 +2459,19 @@ function emAddStep(){
 
 function editAppItem(idx){
   const r=DB.app[idx];
-  _editState={type:'app',idx,v:r.v};
-  const vOpts=[{v:'warn',l:'人為損傷'},{v:'amber',l:'需回倉確認'},{v:'ok',l:'正常耗損'}];
+  _editState={type:'app',idx,isWizard:!!r.steps};
   document.getElementById('em-title').textContent='編輯外觀項目';
-  document.getElementById('em-body').innerHTML=`
-    <div class="form-row"><div><div class="form-label">零件名稱</div><input id="em-p" value="${esc(r.p)}" style="width:100%;box-sizing:border-box"></div></div>
-    <div class="form-row"><div><div class="form-label">損壞描述</div><input id="em-d" value="${esc(r.d)}" style="width:100%;box-sizing:border-box"></div></div>
-    <div class="form-row"><div><div class="form-label">判斷結果</div><div class="verdict-select" id="em-v-sel">${vOpts.map(o=>`<button class="vs-btn${r.v===o.v?' sel-'+o.v:''}" onclick="emSelV('${o.v}',this)">${o.l}</button>`).join('')}</div></div></div>
-    <div class="form-row"><div><div class="form-label">處理建議</div><input id="em-tip" value="${esc(r.tip)}" style="width:100%;box-sizing:border-box"></div></div>`;
+  if(r.steps){
+    renderWizardEditor(r);
+  }else{
+    const vOpts=[{v:'warn',l:'人為損傷'},{v:'amber',l:'需回倉確認'},{v:'ok',l:'正常耗損'}];
+    _editState.v=r.v;
+    document.getElementById('em-body').innerHTML=`
+      <div class="form-row"><div><div class="form-label">零件名稱</div><input id="em-p" value="${esc(r.p)}" style="width:100%;box-sizing:border-box"></div></div>
+      <div class="form-row"><div><div class="form-label">損壞描述</div><input id="em-d" value="${esc(r.d||'')}" style="width:100%;box-sizing:border-box"></div></div>
+      <div class="form-row"><div><div class="form-label">判斷結果</div><div class="verdict-select" id="em-v-sel">${vOpts.map(o=>`<button class="vs-btn${r.v===o.v?' sel-'+o.v:''}" onclick="emSelV('${o.v}',this)">${o.l}</button>`).join('')}</div></div></div>
+      <div class="form-row"><div><div class="form-label">處理建議</div><input id="em-tip" value="${esc(r.tip||'')}" style="width:100%;box-sizing:border-box"></div></div>`;
+  }
   document.getElementById('edit-modal').classList.add('show');
 }
 
@@ -2510,13 +2495,11 @@ function editFuncItem(idx){
 
 function saveEdit(){
   if(!_editState) return;
-  const {type,idx,isWizard}=_editState;
+  const {type,idx,isWizard,isNew}=_editState;
   const arr=type==='app'?DB.app:DB.func;
-  const r=arr[idx];
   if(isWizard){
     const p=document.getElementById('em-p').value.trim();
     if(!p){alert('請填寫問題名稱');return;}
-    r.p=p;
     const steps=[];
     for(let si=0;si<_editState.stepCount;si++){
       if(!document.getElementById('step-'+si)) continue;
@@ -2537,8 +2520,17 @@ function saveEdit(){
       };
       steps.push({q:q.trim(),yL:yL.trim(),nL:nL.trim(),yes:getOut('s'+si+'-y'),no:getOut('s'+si+'-n')});
     }
-    r.steps=steps;
+    if(isNew){
+      const targetEl=document.getElementById('em-target');
+      const target=targetEl?targetEl.value:'通用';
+      arr.push({item:target,p,steps});
+    }else{
+      const r=arr[idx];
+      r.p=p;
+      r.steps=steps;
+    }
   }else{
+    const r=arr[idx];
     const p=document.getElementById('em-p').value.trim();
     const tip=(document.getElementById('em-tip')||{value:''}).value.trim();
     const dEl=document.getElementById('em-d');
@@ -2550,8 +2542,8 @@ function saveEdit(){
     r.v=v;
   }
   saveData();
-  if(type==='app') renderAdminAppList();
-  else renderAdminFuncList();
+  if(type==='app'){renderAdminAppList();showNotice('save-notice-app');}
+  else{renderAdminFuncList();showNotice('save-notice-func');}
   closeEditModal();
 }
 
@@ -2559,6 +2551,45 @@ function renderAdminLists(){
   renderItemManageList();
   renderAdminAppList();
   renderAdminFuncList();
+}
+
+function _admOutcomeLabel(out){
+  const m={ok:'✅ 線上排除',amber:'📋 需回倉確認',warn:'🚨 安全疑慮',repair:'🔧 需回倉送修'};
+  const base=m[out.type]||out.type;
+  if(out.tip){
+    const short=out.tip.length>28?out.tip.substring(0,28)+'…':out.tip;
+    return base+'：'+short;
+  }
+  return base;
+}
+
+function toggleAdminItem(bodyId,arrId){
+  const body=document.getElementById(bodyId);
+  const arr=document.getElementById(arrId);
+  if(!body) return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(arr) arr.textContent=open?'▶':'▼';
+}
+
+function newWizardItem(type){
+  _editState={type,isWizard:true,isNew:true,stepCount:0};
+  document.getElementById('em-title').textContent=type==='app'?'新增外觀項目（多步驟引導）':'新增功能性項目（多步驟引導）';
+  const items=DB.items||[];
+  const selOpts='<option value="通用">通用（所有品項共用）</option>'+items.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');
+  document.getElementById('em-body').innerHTML=`
+    <div class="form-row"><div>
+      <div class="form-label">套用品項</div>
+      <select id="em-target" style="font-family:'Noto Sans TC',sans-serif;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;padding:8px 12px;width:100%;box-sizing:border-box">${selOpts}</select>
+    </div></div>
+    <div class="form-row"><div>
+      <div class="form-label">問題名稱</div>
+      <input id="em-p" placeholder="${type==='app'?'例如：出風口網罩破損':'例如：加熱後自動斷電'}" style="width:100%;box-sizing:border-box">
+    </div></div>
+    <div id="em-steps-container"></div>
+    <button onclick="emAddStep()" style="margin-top:8px;padding:6px 14px;font-size:12px;font-family:inherit;background:#F8F9FA;border:1.5px solid #D5D8DC;border-radius:8px;cursor:pointer;width:100%">＋ 新增判斷步驟</button>
+  `;
+  document.getElementById('edit-modal').classList.add('show');
 }
 
 
