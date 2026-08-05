@@ -1740,8 +1740,8 @@ function onItemChange(){
 
 let wizardState={};
 
-function mkItem(row,key){
-  if(row.steps) return mkWizardItem(row,key);
+function mkItem(row,key,num){
+  if(row.steps) return mkWizardItem(row,key,num);
   const on=!!checked[key];
   const sc=on?(row.v==='warn'?'state-warn':row.v==='amber'?'state-amber':'state-ok'):'';
   const ac=row.v==='warn'?'action-warn':row.v==='amber'?'action-amber':'action-ok';
@@ -1749,14 +1749,14 @@ function mkItem(row,key){
   return `<div class="check-item ${sc}" onclick="toggle('${key}')">
     <div class="cb-box"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3L10 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="item-content">
-      <div class="item-title">${row.p}</div>
+      <div class="item-title">${num?`<span style="color:#95A5A6;font-size:11px;font-weight:400;margin-right:3px">${num}.</span>`:''} ${row.p}</div>
       <div class="item-desc">${row.d}</div>
       ${on?`<span class="item-action ${ac}">${al}${row.tip}</span>`:''}
     </div>
   </div>`;
 }
 
-function mkWizardItem(row,key){
+function mkWizardItem(row,key,num){
   const ws=wizardState[key]||null;
   const result=ws?ws.result:null;
   const rCls={ok:'state-ok',amber:'state-amber',warn:'state-warn',repair:'state-amber'}[result]||'';
@@ -1797,7 +1797,7 @@ function mkWizardItem(row,key){
     <div style="display:flex;align-items:center;gap:10px">
       <div class="cb-box">${result?'<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3L10 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div>
       <div class="item-content">
-        <div class="item-title">${row.p}</div>
+        <div class="item-title">${num?`<span style="color:#95A5A6;font-size:11px;font-weight:400;margin-right:3px">${num}.</span>`:''} ${row.p}</div>
         <div class="item-desc" style="font-size:11px;color:#7F8C8D">${result?rLabel:'點選展開逐步判斷'}</div>
         ${result?`<span class="item-action ${ac}">${rLabel}</span>`:''}
       </div>
@@ -1861,8 +1861,8 @@ function renderCol(type,containerId,countId){
   const specific=rows.filter(r=>r.item===item);
   const prefix=type+'_'+item+'_';
   let cnt=0;
-  const cHTML=common.map((r,i)=>{ const k=prefix+'c'+i; if(checked[k])cnt++; return mkItem(r,k); }).join('');
-  const sHTML=specific.map((r,i)=>{ const k=prefix+'s'+i; if(checked[k])cnt++; return mkItem(r,k); }).join('');
+  const cHTML=common.map((r,i)=>{ const k=prefix+'c'+i; if(checked[k])cnt++; return mkItem(r,k,i+1); }).join('');
+  const sHTML=specific.map((r,i)=>{ const k=prefix+'s'+i; if(checked[k])cnt++; return mkItem(r,k,i+1); }).join('');
   const cLabel=type==='app'?'通用外觀項目':'通用功能性項目';
   document.getElementById(containerId).innerHTML=
     `<span class="sec-label">${cLabel}</span>${cHTML}`+
@@ -2300,44 +2300,65 @@ function delAppItem(idx){
   saveData(); renderAdminAppList();
 }
 
+function _buildAdmCard(r,realIdx,num,pfx,editFn,delFn){
+  const tagCls=r.item==='通用'?'itag-common':'itag-item';
+  const stepCount=r.steps?r.steps.length:0;
+  const hasSteps=!!r.steps;
+  const bodyId=pfx+'b'+realIdx;
+  const arrId=pfx+'a'+realIdx;
+  return `<div class="adm-wizard-card">
+    <div class="adm-wizard-header" onclick="toggleAdminItem('${bodyId}','${arrId}')">
+      <span class="adm-arr" id="${arrId}">▶</span>
+      <span style="color:#95A5A6;font-size:11px;font-weight:600;flex-shrink:0;min-width:20px">${num}.</span>
+      <span class="adm-wizard-title">${r.p}</span>
+      ${hasSteps?`<span class="adm-step-badge">${stepCount} 步驟</span>`:''}
+      <div class="adm-actions">
+        <button class="edit-btn-sm" onclick="event.stopPropagation();${editFn}(${realIdx})" title="編輯">✏</button>
+        <button class="del-btn" onclick="event.stopPropagation();${delFn}(${realIdx})" title="刪除">×</button>
+      </div>
+    </div>
+    <div class="adm-wizard-body" id="${bodyId}" style="display:none">
+      ${hasSteps?r.steps.map((s,si)=>`
+        <div class="adm-step-preview">
+          <div class="adm-step-num">步驟 ${si+1}</div>
+          <div class="adm-step-q">${esc(s.q||'')}</div>
+          <div class="adm-step-outcomes">
+            <span class="adm-outcome">✔ ${esc(s.yL||'是')} → ${s.yes?`<em>${_admOutcomeLabel(s.yes)}</em>`:'<em>繼續下一題</em>'}</span>
+            <span class="adm-outcome">✘ ${esc(s.nL||'否')} → ${s.no?`<em>${_admOutcomeLabel(s.no)}</em>`:'<em>繼續下一題</em>'}</span>
+          </div>
+        </div>`).join(''):'<div style="color:#95A5A6;font-size:12px;padding:8px 0">無步驟資料</div>'}
+    </div>
+  </div>`;
+}
+
+function _admGroupHtml(db,filter,editFn,delFn,pfx){
+  let html='';
+  if(filter){
+    // Filtered: show only matching item, numbered from 1
+    const rows=db.filter(r=>r.item===filter);
+    if(!rows.length) return '<div class="empty-state">尚無項目</div>';
+    rows.forEach((r,li)=>{ html+=_buildAdmCard(r,db.indexOf(r),li+1,pfx,editFn,delFn); });
+  } else {
+    // All: group by item type, each group numbered from 1
+    const groups=['通用',...DB.items];
+    let hasAny=false;
+    groups.forEach(grp=>{
+      const rows=db.filter(r=>r.item===grp);
+      if(!rows.length) return;
+      hasAny=true;
+      const tagCls=grp==='通用'?'itag-common':'itag-item';
+      html+=`<div style="font-size:11px;font-weight:700;color:#7F8C8D;padding:8px 4px 4px;margin-top:4px;border-bottom:1px solid #F0F2F5;margin-bottom:4px"><span class="itag ${tagCls}" style="font-size:10px">${grp}</span></div>`;
+      rows.forEach((r,li)=>{ html+=_buildAdmCard(r,db.indexOf(r),li+1,pfx,editFn,delFn); });
+    });
+    if(!hasAny) html='<div class="empty-state">尚無項目</div>';
+  }
+  return html;
+}
+
 function renderAdminAppList(){
   const filter=document.getElementById('app-filter-item').value;
   const el=document.getElementById('admin-app-list');
-  const rows=filter?DB.app.filter(r=>r.item===filter):DB.app;
-  if(!rows.length){el.innerHTML='<div class="empty-state">尚無外觀項目</div>';return;}
-  let html='';
-  rows.forEach(r=>{
-    const realIdx=DB.app.indexOf(r);
-    const tagCls=r.item==='通用'?'itag-common':'itag-item';
-    const stepCount=r.steps?r.steps.length:0;
-    const hasSteps=!!r.steps;
-    const bodyId='aadm-'+realIdx;
-    const arrId='aarr-'+realIdx;
-    html+=`<div class="adm-wizard-card">
-      <div class="adm-wizard-header" onclick="toggleAdminItem('${bodyId}','${arrId}')">
-        <span class="adm-arr" id="${arrId}">▶</span>
-        <span class="itag ${tagCls}">${r.item}</span>
-        <span class="adm-wizard-title">${r.p}</span>
-        ${hasSteps?`<span class="adm-step-badge">${stepCount} 步驟</span>`:''}
-        <div class="adm-actions">
-          <button class="edit-btn-sm" onclick="event.stopPropagation();editAppItem(${realIdx})" title="編輯">✏</button>
-          <button class="del-btn" onclick="event.stopPropagation();delAppItem(${realIdx})" title="刪除">×</button>
-        </div>
-      </div>
-      <div class="adm-wizard-body" id="${bodyId}" style="display:none">
-        ${hasSteps?r.steps.map((s,si)=>`
-          <div class="adm-step-preview">
-            <div class="adm-step-num">步驟 ${si+1}</div>
-            <div class="adm-step-q">${esc(s.q||'')}</div>
-            <div class="adm-step-outcomes">
-              <span class="adm-outcome">✔ ${esc(s.yL||'是')} → ${s.yes?`<em>${_admOutcomeLabel(s.yes)}</em>`:'<em>繼續下一題</em>'}</span>
-              <span class="adm-outcome">✘ ${esc(s.nL||'否')} → ${s.no?`<em>${_admOutcomeLabel(s.no)}</em>`:'<em>繼續下一題</em>'}</span>
-            </div>
-          </div>`).join(''):'<div style="color:#95A5A6;font-size:12px;padding:8px 0">無步驟資料</div>'}
-      </div>
-    </div>`;
-  });
-  el.innerHTML=html;
+  el.innerHTML=_admGroupHtml(DB.app,filter,'editAppItem','delAppItem','aa');
 }
 
 /* ── 功能性項目管理 ── */
@@ -2365,41 +2386,7 @@ function delFuncItem(idx){
 function renderAdminFuncList(){
   const filter=document.getElementById('func-filter-item').value;
   const el=document.getElementById('admin-func-list');
-  const rows=filter?DB.func.filter(r=>r.item===filter):DB.func;
-  if(!rows.length){el.innerHTML='<div class="empty-state">尚無功能性項目</div>';return;}
-  let html='';
-  rows.forEach(r=>{
-    const realIdx=DB.func.indexOf(r);
-    const tagCls=r.item==='通用'?'itag-common':'itag-item';
-    const stepCount=r.steps?r.steps.length:0;
-    const hasSteps=!!r.steps;
-    const bodyId='fadm-'+realIdx;
-    const arrId='farr-'+realIdx;
-    html+=`<div class="adm-wizard-card">
-      <div class="adm-wizard-header" onclick="toggleAdminItem('${bodyId}','${arrId}')">
-        <span class="adm-arr" id="${arrId}">▶</span>
-        <span class="itag ${tagCls}">${r.item}</span>
-        <span class="adm-wizard-title">${r.p}</span>
-        ${hasSteps?`<span class="adm-step-badge">${stepCount} 步驟</span>`:''}
-        <div class="adm-actions">
-          <button class="edit-btn-sm" onclick="event.stopPropagation();editFuncItem(${realIdx})" title="編輯">✏</button>
-          <button class="del-btn" onclick="event.stopPropagation();delFuncItem(${realIdx})" title="刪除">×</button>
-        </div>
-      </div>
-      <div class="adm-wizard-body" id="${bodyId}" style="display:none">
-        ${hasSteps?r.steps.map((s,si)=>`
-          <div class="adm-step-preview">
-            <div class="adm-step-num">步驟 ${si+1}</div>
-            <div class="adm-step-q">${esc(s.q||'')}</div>
-            <div class="adm-step-outcomes">
-              <span class="adm-outcome">✔ ${esc(s.yL||'是')} → ${s.yes?`<em>${_admOutcomeLabel(s.yes)}</em>`:'<em>繼續下一題</em>'}</span>
-              <span class="adm-outcome">✘ ${esc(s.nL||'否')} → ${s.no?`<em>${_admOutcomeLabel(s.no)}</em>`:'<em>繼續下一題</em>'}</span>
-            </div>
-          </div>`).join(''):'<div style="color:#95A5A6;font-size:12px;padding:8px 0">無步驟資料</div>'}
-      </div>
-    </div>`;
-  });
-  el.innerHTML=html;
+  el.innerHTML=_admGroupHtml(DB.func,filter,'editFuncItem','delFuncItem','fa');
 }
 
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
