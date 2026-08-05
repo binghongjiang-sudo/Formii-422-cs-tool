@@ -439,17 +439,21 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
     <div class="card">
       <div class="card-body" style="padding-bottom:0">
         <div class="admin-tabs">
-          <button class="admin-tab on" id="atab-item" onclick="switchAdminTab('item')">品項管理</button>
-          <button class="admin-tab" id="atab-price" onclick="switchAdminTab('price')">💰 售價管理</button>
-          <button class="admin-tab" id="atab-app" onclick="switchAdminTab('app')">新增外觀項目</button>
-          <button class="admin-tab" id="atab-func" onclick="switchAdminTab('func')">新增功能性項目</button>
-          <button class="admin-tab" id="atab-sc" onclick="switchAdminTab('sc')">情境判斷設定</button>
+          <button class="admin-tab on" id="atab-item" onclick="switchAdminTab('item')">STEP 1-2　商品管理</button>
+          <button class="admin-tab" id="atab-app" onclick="switchAdminTab('app')">STEP 3　外觀項目</button>
+          <button class="admin-tab" id="atab-func" onclick="switchAdminTab('func')">STEP 3　功能性項目</button>
+          <button class="admin-tab" id="atab-sc" onclick="switchAdminTab('sc')">STEP 4-5　回倉判斷</button>
+          <button class="admin-tab" id="atab-price" onclick="switchAdminTab('price')">STEP 6　零件售價</button>
         </div>
       </div>
 
       <!-- Tab: 品項管理 -->
       <div id="admin-tab-item" class="card-body">
         <div class="save-notice" id="save-notice-item">已儲存</div>
+        <div style="background:#EBF5FB;border-left:4px solid #2E86C1;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1A5276;line-height:1.7">
+          <strong>📍 對應操作者介面：STEP 1（選擇品牌）→ STEP 2（選擇商品）</strong><br>
+          此處新增或刪除的品項，會直接影響操作者在 STEP 1-2 看到的商品下拉選單。
+        </div>
         <p style="font-size:12px;color:#5D6D7E;margin-bottom:12px;line-height:1.7">新增品項後，選項會自動出現在客服查詢介面的下拉選單。刪除品項會一併移除該品項的所有外觀及功能性項目。</p>
 
         <div class="form-row cols-2">
@@ -470,6 +474,10 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
       <!-- Tab: 售價管理 -->
       <div id="admin-tab-price" class="card-body" style="display:none">
         <div class="save-notice" id="save-notice-price">售價已儲存</div>
+        <div style="background:#F4ECF7;border-left:4px solid #7D3C98;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#4A235A;line-height:1.7">
+          <strong>📍 對應操作者介面：STEP 6（維修費用估算）</strong><br>
+          此處設定的商品售價，用於 STEP 6 計算維修費佔售價比例，輔助判斷是否建議換新。
+        </div>
         <p style="font-size:12px;color:#5D6D7E;margin-bottom:12px;line-height:1.7">商品售價變更後在此修改，用於送修判斷成本比對計算。</p>
         <div id="price-list"></div>
       </div>
@@ -477,6 +485,10 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
       <!-- Tab: 新增外觀項目 -->
       <div id="admin-tab-app" class="card-body" style="display:none">
         <div class="save-notice" id="save-notice-app">已儲存</div>
+        <div style="background:#EAFAF1;border-left:4px solid #1E8449;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#145A32;line-height:1.7">
+          <strong>📍 對應操作者介面：STEP 3（外觀類勾選 / 多步驟判斷）</strong><br>
+          此處新增的外觀項目，會出現在操作者 STEP 3「外觀類」欄位，供客服逐步判斷是否人為損傷或安全疑慮。
+        </div>
         <div class="form-row">
           <div>
             <div class="form-label">套用品項</div>
@@ -526,6 +538,10 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
       <!-- Tab: 新增功能性項目 -->
       <div id="admin-tab-func" class="card-body" style="display:none">
         <div class="save-notice" id="save-notice-func">已儲存</div>
+        <div style="background:#EAFAF1;border-left:4px solid #1E8449;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#145A32;line-height:1.7">
+          <strong>📍 對應操作者介面：STEP 3（功能性類勾選 / 多步驟判斷）</strong><br>
+          此處新增的功能性項目，會出現在操作者 STEP 3「功能性類」欄位，判斷結果若為紫色或紅色，將自動觸發 STEP 4-6 回倉流程。
+        </div>
         <div class="form-row">
           <div>
             <div class="form-label">套用品項</div>
@@ -578,6 +594,10 @@ input::placeholder,textarea::placeholder{color:#BDC3C7}
       <!-- Tab: 情境判斷設定 -->
       <div id="admin-tab-sc" class="card-body" style="display:none">
         <div class="save-notice" id="save-notice-sc">已儲存</div>
+        <div style="background:#FEF9E7;border-left:4px solid #D4AC0D;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#7D6608;line-height:1.7">
+          <strong>📍 對應操作者介面：STEP 4（保固狀態）→ STEP 5（損傷判斷）</strong><br>
+          此處設定各商品的回倉情境腳本，對應操作者在 STEP 4 選擇保固狀態、STEP 5 判斷損傷類型後顯示的標準處理話術與流程。
+        </div>
         <div style="padding:4px 0 14px">
           <div class="form-label" style="margin-bottom:6px">選擇商品</div>
           <select id="sc-admin-prod" onchange="renderScAdminPanel()" style="font-family:'Noto Sans TC',sans-serif;font-size:13px;border:1.5px solid #D5D8DC;border-radius:8px;padding:8px 12px;width:200px">
