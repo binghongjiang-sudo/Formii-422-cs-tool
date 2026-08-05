@@ -1973,13 +1973,13 @@ function getRepairItems(){
       if(!row.steps) return;
       const k=pfx+'c'+i;
       const ws=wizardState[k];
-      if(ws&&(ws.result==='repair'||ws.result==='amber')) repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
+      if(ws&&(ws.result==='repair'||ws.result==='amber'||ws.result==='warn')) repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
     });
     spec.forEach((row,i)=>{
       if(!row.steps) return;
       const k=pfx+'s'+i;
       const ws=wizardState[k];
-      if(ws&&(ws.result==='repair'||ws.result==='amber')) repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
+      if(ws&&(ws.result==='repair'||ws.result==='amber'||ws.result==='warn')) repairs.push({symptom:row.p,cause:ws.cause,tip:ws.tip,parts:ws.parts||null});
     });
   }
   _scan(DB.func,'func_'+item+'_');
